@@ -86,7 +86,8 @@ CREATE TABLE diagnoses_icd (
     seq_num INTEGER,
     icd9_code VARCHAR(10),
     FOREIGN KEY (subject_id) REFERENCES patients(subject_id),
-    FOREIGN KEY (hadm_id) REFERENCES admissions(hadm_id)
+    FOREIGN KEY (hadm_id) REFERENCES admissions(hadm_id),
+    FOREIGN KEY (icd9_code) REFERENCES d_icd_diagnoses(icd9_code)
 );
 
 CREATE INDEX idx_patients_subject_id ON patients(subject_id);
