@@ -1,0 +1,110 @@
+---
+title: Hospital Patient Journey – Simplified E/R Diagram (Phase 1)
+config:
+  flowchart:
+    layout: LR
+    nodeSpacing: 28
+    rankSpacing: 24
+  layout: elk
+---
+%%{init: {'theme': 'base', 'themeVariables': { 'background': '#ffffff' }}}%%
+flowchart LR
+classDef strong stroke:#000,stroke-width:2px
+classDef key stroke-width:4px,text-decoration:underline
+
+PAT_ROW(["ROW_ID"]):::key --- PAT["PATIENTS"]:::strong
+PAT_ID(["<u>SUBJECT_ID</u>"]):::key --- PAT
+PAT_GENDER(["GENDER"]) --- PAT
+PAT_DOB(["DOB"]) --- PAT
+PAT_DOD(["DOD"]) --- PAT
+PAT_DOD_HOSP(["DOD_HOSP"]) --- PAT
+PAT_DOD_SSN(["DOD_SSN"]) --- PAT
+PAT_EXPIRE(["EXPIRE_FLAG"]) --- PAT
+
+ADM_ROW(["ROW_ID"]):::key --- ADM["ADMISSIONS"]:::strong
+ADM_SUBJ(["SUBJECT_ID (FK)"]) --- ADM
+ADM_ID(["<u>HADM_ID</u>"]):::key --- ADM
+ADM_ADMIT(["ADMITTIME"]) --- ADM
+ADM_DISCH(["DISCHTIME"]) --- ADM
+ADM_DEATH(["DEATHTIME"]) --- ADM
+ADM_TYPE(["ADMISSION_TYPE"]) --- ADM
+ADM_LOC(["ADMISSION_LOCATION"]) --- ADM
+ADM_DISC_LOC(["DISCHARGE_LOCATION"]) --- ADM
+ADM_INS(["INSURANCE"]) --- ADM
+ADM_LANG(["LANGUAGE"]) --- ADM
+ADM_RELIG(["RELIGION"]) --- ADM
+ADM_MARITAL(["MARITAL_STATUS"]) --- ADM
+ADM_ETHNIC(["ETHNICITY"]) --- ADM
+ADM_EDREG(["EDREGTIME"]) --- ADM
+ADM_EDOUT(["EDOUTTIME"]) --- ADM
+ADM_DIAG(["DIAGNOSIS"]) --- ADM
+ADM_HOSP_EXP(["HOSPITAL_EXPIRE_FLAG"]) --- ADM
+ADM_CHART(["HAS_CHARTEVENTS_DATA"]) --- ADM
+
+ICU_ROW(["ROW_ID"]):::key --- ICU["ICUSTAYS"]:::strong
+ICU_SUBJ(["SUBJECT_ID (FK)"]) --- ICU
+ICU_HADM(["HADM_ID (FK)"]) --- ICU
+ICU_ID(["<u>ICUSTAY_ID</u>"]):::key --- ICU
+ICU_DB(["DBSOURCE"]) --- ICU
+ICU_FIRST(["FIRST_CAREUNIT"]) --- ICU
+ICU_LAST(["LAST_CAREUNIT"]) --- ICU
+ICU_FIRST_WARD(["FIRST_WARDID"]) --- ICU
+ICU_LAST_WARD(["LAST_WARDID"]) --- ICU
+ICU_IN(["INTIME"]) --- ICU
+ICU_OUT(["OUTTIME"]) --- ICU
+ICU_LOS(["LOS"]) --- ICU
+
+NOTE_ID(["<u>ROW_ID</u>"]):::key --- NOTE["NOTEEVENTS"]:::strong
+NOTE_SUBJ(["SUBJECT_ID (FK)"]) --- NOTE
+NOTE_HADM(["HADM_ID (FK)"]) --- NOTE
+NOTE_DATE(["CHARTDATE"]) --- NOTE
+NOTE_TIME(["CHARTTIME"]) --- NOTE
+NOTE_STORE(["STORETIME"]) --- NOTE
+NOTE_CAT(["CATEGORY"]) --- NOTE
+NOTE_DESC(["DESCRIPTION"]) --- NOTE
+NOTE_CGID(["CGID"]) --- NOTE
+NOTE_ERR(["ISERROR"]) --- NOTE
+NOTE_TEXT(["TEXT"]) --- NOTE
+
+DIAG_ID(["<u>ROW_ID</u>"]):::key --- DIAG["DIAGNOSES_ICD"]:::strong
+DIAG_SUBJ(["SUBJECT_ID (FK)"]) --- DIAG
+DIAG_HADM(["HADM_ID (FK)"]) --- DIAG
+DIAG_SEQ(["SEQ_NUM"]) --- DIAG
+DIAG_CODE(["ICD9_CODE (FK)"]) --- DIAG
+
+ICDD_ROW(["ROW_ID"]):::key --- ICDD["D_ICD_DIAGNOSES"]:::strong
+ICDD_CODE(["<u>ICD9_CODE</u>"]):::key --- ICDD
+ICDD_SHORT(["SHORT_TITLE"]) --- ICDD
+ICDD_LONG(["LONG_TITLE"]) --- ICDD
+
+R_HAS_ADMISSION{HAS_ADMISSION}
+PAT -- "1" --- R_HAS_ADMISSION
+R_HAS_ADMISSION -- "0..N" --- ADM
+
+R_INCLUDES_ICU{INCLUDES_ICU}
+ADM -- "1" --- R_INCLUDES_ICU
+R_INCLUDES_ICU -- "0..N" --- ICU
+
+R_HAS_ICU{HAS_ICU}
+PAT -- "1" --- R_HAS_ICU
+R_HAS_ICU -- "0..N" --- ICU
+
+R_HAS_NOTE{HAS_NOTE}
+ADM -- "1" --- R_HAS_NOTE
+R_HAS_NOTE -- "0..N" --- NOTE
+
+R_SUBJECT_NOTE{SUBJECT_NOTE}
+PAT -- "1" --- R_SUBJECT_NOTE
+R_SUBJECT_NOTE -- "0..N" --- NOTE
+
+R_HAS_DIAG{HAS_DIAGNOSIS}
+ADM -- "1" --- R_HAS_DIAG
+R_HAS_DIAG -- "0..N" --- DIAG
+
+R_RECEIVES_DIAG{RECEIVES_DIAGNOSIS}
+PAT -- "1" --- R_RECEIVES_DIAG
+R_RECEIVES_DIAG -- "0..N" --- DIAG
+
+R_DEFINES{DEFINES}
+ICDD -- "1" --- R_DEFINES
+R_DEFINES -- "0..N" --- DIAG
