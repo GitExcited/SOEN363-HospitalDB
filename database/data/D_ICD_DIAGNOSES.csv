@@ -14566,3 +14566,23 @@ row_id,icd9_code,short_title,long_title
 14565,V872,Cont/exp hazard chem NEC,Contact with and (suspected) exposure to other potentially hazardous chemicals
 14566,V8731,Contact/exposure mold,Contact with and (suspected) exposure to mold
 14567,V8732,Contact/exp algae bloom,Contact with and (suspected) exposure to algae bloom
+14568,0414,E coli infection,"Escherichia coli [E. coli] infection in conditions classified elsewhere and of unspecified site"
+14569,2554,Corticoadrenal insuf,"Corticoadrenal insufficiency"
+14570,2765,Volume depletion,"Volume depletion disorder"
+14571,2766,Fluid overload,"Fluid overload disorder"
+14572,2841,Pancytopenia,"Pancytopenia"
+14573,2848,Aplastic anemia NEC,"Other specified aplastic anemias"
+14574,2874,Sec thrombocytopenia,"Secondary thrombocytopenia"
+14575,3488,Brain condition NEC,"Other conditions of brain"
+14576,4538,Esoph disorder NEC,"Other specified disorders of esophagus"
+14577,4582,Hypotension NEC,"Other specified hypotension"
+14578,5185,Pulm insuf post-trauma,"Pulmonary insufficiency following trauma and surgery"
+14579,5672,Peritonitis NEC,"Other suppurative peritonitis"
+14580,585,Chronic kidney dis,"Chronic kidney disease (CKD)"
+14581,6000,BPH w/o urinary obs,"Hypertrophy (benign) of prostate without urinary obstruction and other lower urinary tract symptom (LUTS)"
+14582,7299,Soft tissue dis NEC,"Other and unspecified disorders of soft tissue"
+14583,7806,Fever,"Fever and other physiologic disturbances of temperature regulation"
+14584,7872,Dysphagia,"Dysphagia"
+14585,7895,Ascites,"Ascites"
+14586,9974,Digestive comp NEC,"Digestive system complications not elsewhere classified"
+14587,9980,Postop shock,"Postoperative shock"

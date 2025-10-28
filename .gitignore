@@ -1,0 +1,44 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS thumbnails
+._*
+
+# macOS directories
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database files (optional - uncomment if you don't want to track database volumes)
+# db_data/
+
+# Python (if you add Python scripts later)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# Node modules (if you add Node.js later)
+node_modules/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
