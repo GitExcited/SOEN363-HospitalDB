@@ -1,0 +1,8 @@
+-- query 11
+SELECT 
+    HADM_ID,
+    COUNT(*) AS note_count
+FROM NOTEEVENTS
+WHERE HADM_ID IS NOT NULL
+GROUP BY HADM_ID
+ORDER BY note_count DESC;
