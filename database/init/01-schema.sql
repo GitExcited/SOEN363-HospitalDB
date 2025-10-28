@@ -89,14 +89,3 @@ CREATE TABLE diagnoses_icd (
     FOREIGN KEY (hadm_id) REFERENCES admissions(hadm_id),
     FOREIGN KEY (icd9_code) REFERENCES d_icd_diagnoses(icd9_code)
 );
-
-CREATE INDEX idx_patients_subject_id ON patients(subject_id);
-CREATE INDEX idx_admissions_subject_id ON admissions(subject_id);
-CREATE INDEX idx_admissions_hadm_id ON admissions(hadm_id);
-CREATE INDEX idx_icustays_subject_id ON icustays(subject_id);
-CREATE INDEX idx_icustays_hadm_id ON icustays(hadm_id);
-CREATE INDEX idx_noteevents_subject_id ON noteevents(subject_id);
-CREATE INDEX idx_noteevents_hadm_id ON noteevents(hadm_id);
-CREATE INDEX idx_diagnoses_subject_id ON diagnoses_icd(subject_id);
-CREATE INDEX idx_diagnoses_hadm_id ON diagnoses_icd(hadm_id);
-CREATE INDEX idx_diagnoses_icd9_code ON diagnoses_icd(icd9_code);
