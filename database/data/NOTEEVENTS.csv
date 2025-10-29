@@ -1,4 +1,4 @@
-row_id,subject_id,hadm_id,chartdate,charttime,storetime,category,description,cgid,iserror,text
+List of patients with radiology report or ECG report during the hospitalization.row_id,subject_id,hadm_id,chartdate,charttime,storetime,category,description,cgid,iserror,text
 1,10120,193924,2115-05-21,2115-05-21 16:52,2115-05-22 13:52,Radiology,Consult note,1701,,Sample ECG note for patient 10120.
 2,42458,159647,2146-07-21,2146-07-22 1:45,2146-07-22 8:45,Radiology,Discharge note,1738,,Sample Radiology note for patient 42458.
 3,41795,118192,2145-09-14,2145-09-14 13:52,2145-09-15 0:52,ECG,Admission note,1173,0,Sample Radiology note for patient 41795.
