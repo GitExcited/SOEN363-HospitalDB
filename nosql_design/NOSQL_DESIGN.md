@@ -123,7 +123,7 @@ For each admission, we embedd the number of icustays and its attributes: icustay
                 "long_title": " Cholera due to vibrio cholerae", <- comes from d_icd_diagnoses
                  "short_title": "Cholera" <-- also from  d_icd_diagnoses
                  },
-                 .... <-- les autres diagnoses_icd   
+                 .... <-- the other diagnoses_icd   
                 ]
 
 
