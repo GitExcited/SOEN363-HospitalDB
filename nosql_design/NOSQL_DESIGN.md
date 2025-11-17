@@ -28,8 +28,9 @@
 ### Embedded arrays
 
 1. `admissions`  embedded array in patients `patients.admissions[]`
-Each admission is saved within patients as a sub-document with its columns becoming the attributes: 
-hamd_id, admittime, dischtime, admission_type, diagnosis, etc.. 
+*Embed based on: admissions.subject_id = patients.subject_id*
+Each admission is saved within patients as a sub-document with its columns becoming the attributes:
+hadm_id, admittime, dischtime, admission_type, diagnosis, etc.. 
 ```json
   PATIENTS COLLECTION 
  {
@@ -54,7 +55,9 @@ hamd_id, admittime, dischtime, admission_type, diagnosis, etc..
   }
 ```
 
-2. `icustays` embedded array inside of `admissions`. 
+2. `icustays` embedded array inside of `admissions`.
+*Embed based on: icustays.hadm_id = admissions.hadm_id (ICU stays belong to a specific admission)*
+*Note: icustays.subject_id also matches the parent patient's subject_id (inherited through admission)*
 For each admission, we embedd the number of icustays and its attributes: icustay_id, intime, outtime, first_careunit, last_careunit, los, etc
 ```json
   PATIENTS COLLECTION 
@@ -90,7 +93,9 @@ For each admission, we embedd the number of icustays and its attributes: icustay
   }
 
 ```
-3. `diagnoses_icd` embedded array inside of `admissions`. For each icd9_code we also extract the short_title and long_title from table `d_icd_diagnoses`
+3. `diagnoses_icd` embedded array inside of `admissions`.
+*Embed based on: diagnoses_icd.hadm_id = admissions.hadm_id (diagnoses belong to a specific admission)*
+For each icd9_code we also extract the short_title and long_title from table `d_icd_diagnoses`
 ```json
   PATIENTS COLLECTION 
  {
