@@ -25,7 +25,7 @@
   ... etc
 }
 ```
-### Embedded arrays
+### Embedded arrays (1-to-many relationships)
 
 1. `admissions`  embedded array in patients `patients.admissions[]`
 *Embed based on: admissions.subject_id = patients.subject_id*
@@ -96,6 +96,11 @@ For each admission, we embedd the number of icustays and its attributes: icustay
 3. `diagnoses_icd` embedded array inside of `admissions`.
 *Embed based on: diagnoses_icd.hadm_id = admissions.hadm_id (diagnoses belong to a specific admission)*
 For each icd9_code we also extract the short_title and long_title from table `d_icd_diagnoses`
+
+### Denormalized data (lookup tables merged into documents)
+
+- **`d_icd_diagnoses`** table is denormalized into the `diagnoses_icd` embedded array
+  - Instead of storing only `icd9_code` and doing lookups, we copy `short_title` and `long_title` directly into each diagnosis
 ```json
   PATIENTS COLLECTION 
  {
