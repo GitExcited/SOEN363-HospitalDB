@@ -1,0 +1,349 @@
+======================================================================
+DATA LOADING EXECUTION REPORT
+SOEN363 Phase 2 - Person 4 (Data Loading to MongoDB)
+======================================================================
+
+Execution Date: 2025-11-22
+Execution Time: 08:27:18 - 08:28:13
+
+## PROJECT OVERVIEW
+
+This report documents the successful loading of 100 patient records from PostgreSQL
+(Phase 1 relational database) into MongoDB (Phase 2 NoSQL database), following the
+denormalized schema design created by Person 2 (David).
+
+The migration follows the mapping strategy defined in NOSQL_DESIGN.md:
+- Patients collection as main collection
+- Admissions embedded as arrays within patient documents
+- ICU stays (icustays) embedded within admissions
+- Diagnoses embedded within admissions with denormalized ICD codes
+- NoteEvents as separate collection for scalability
+
+======================================================================
+## EXECUTION SUMMARY
+
+Status: SUCCESSFUL ✓
+
+Load Statistics:
+  - Total Duration: 0.51 seconds (first run), 0.27 seconds (subsequent runs)
+  - Patients documents loaded: 100
+  - NoteEvents documents loaded: 100
+  - Total admissions embedded: 129
+  - Total ICU stays embedded: 136
+  - Total diagnoses embedded: 1,761
+  - Total indexes created: 6
+
+Data Transformation:
+  - SQL JSONB format → MongoDB document format (automatic type conversion)
+  - ISO date format preserved: ISODate("YYYY-MM-DDTHH:MM:SS")
+  - All nested relationships properly embedded
+
+======================================================================
+## MONGODB COLLECTION STRUCTURE
+
+### Collection: patients (100 documents)
+Document Structure:
+{
+  "_id": <subject_id>,
+  "gender": "F|M",
+  "dob": ISODate(...),
+  "dod": ISODate(...),
+  "dod_hosp": ISODate(...),
+  "dod_ssn": ISODate(...),
+  "expire_flag": 0|1,
+  "admissions": [
+    {
+      "hadm_id": <id>,
+      "admittime": ISODate(...),
+      "dischtime": ISODate(...),
+      "deathtime": ISODate(...),
+      "admission_type": "EMERGENCY|ELECTIVE|...",
+      "admission_location": "...",
+      "discharge_location": "...",
+      "insurance": "Medicare|Private|...",
+      "language": "...",
+      "religion": "...",
+      "marital_status": "...",
+      "ethnicity": "...",
+      "edregtime": ISODate(...),
+      "edouttime": ISODate(...),
+      "diagnosis": "...",
+      "hospital_expire_flag": 0|1,
+      "has_chartevents_data": 0|1,
+      "icustays": [
+        {
+          "icustay_id": <id>,
+          "dbsource": "carevue|metavision",
+          "first_careunit": "MICU|SICU|CCU|...",
+          "last_careunit": "MICU|SICU|CCU|...",
+          "first_wardid": <id>,
+          "last_wardid": <id>,
+          "intime": ISODate(...),
+          "outtime": ISODate(...),
+          "los": <numeric>
+        }
+      ],
+      "diagnoses_icd": [
+        {
+          "seq_num": <position>,
+          "icd9_code": "...",
+          "short_title": "...",
+          "long_title": "..."
+        }
+      ]
+    }
+  ]
+}
+
+Sample Patient Document:
+{
+  "_id": 10006,
+  "gender": "F",
+  "dob": "2094-03-05T00:00:00",
+  "dod": "2165-08-12T00:00:00",
+  "expire_flag": 1,
+  "admissions": [
+    {
+      "hadm_id": 142345,
+      "admission_type": "EMERGENCY",
+      "diagnosis": "SEPSIS",
+      "icustays": [
+        {
+          "icustay_id": 206504,
+          "first_careunit": "MICU",
+          "los": 1.6325
+        }
+      ],
+      "diagnoses_icd": [
+        {
+          "seq_num": 1,
+          "icd9_code": "99591",
+          "short_title": "Sepsis",
+          "long_title": "Sepsis"
+        }
+      ]
+    }
+  ]
+}
+
+### Collection: noteevents (100 documents)
+Document Structure:
+{
+  "_id": ObjectId(...),
+  "subject_id": <id>,
+  "hadm_id": <id>,
+  "chartdate": ISODate(...),
+  "charttime": ISODate(...),
+  "storetime": ISODate(...),
+  "category": "Radiology|Nursing|...",
+  "description": "...",
+  "cgid": <id>,
+  "iserror": 0|1,
+  "text": "..."
+}
+
+Sample NoteEvent Document:
+{
+  "_id": ObjectId(...),
+  "subject_id": 10120,
+  "hadm_id": 193924,
+  "category": "Radiology",
+  "chartdate": "2115-05-21",
+  "text": "..."
+}
+
+======================================================================
+## INDEXES CREATED
+
+Database: hospital_db_nosql
+
+1. patients.subject_id
+   Purpose: Fast subject ID lookups within patients collection
+
+2. patients.admissions.hadm_id
+   Purpose: Find admissions by hospital admission ID
+
+3. patients.expire_flag
+   Purpose: Filter patients by mortality status
+
+4. noteevents.subject_id
+   Purpose: Find all notes for a patient
+
+5. noteevents.hadm_id
+   Purpose: Find all notes for a specific admission
+
+6. noteevents.chartdate
+   Purpose: Find notes by chart date for time-based queries
+
+Total indexes: 6
+
+======================================================================
+## DATA QUALITY & VALIDATION
+
+✓ Completeness Check: 100% of patient records migrated successfully
+✓ Row Count Matching: All 100 source records loaded
+✓ Data Type Conversion: Dates properly converted to ISODate format
+✓ Referential Integrity: All nested relationships preserved
+✓ No Data Loss: All admissions, ICU stays, and diagnoses embedded
+
+Embedded Data Summary:
+  - Average admissions per patient: 1.29
+  - Average ICU stays per admission: 1.05
+  - Average diagnoses per admission: 13.6
+  - Maximum diagnoses in single admission: 27
+
+======================================================================
+## TRANSFORMATION LOGIC & DENORMALIZATION
+
+### Key Design Decisions
+
+1. Patient-Admission Relationship (1-to-many)
+   - Embedded admissions array within patient document
+   - Rationale: Always accessed together, bounded 1-to-few relationship
+   - SQL join: patients.subject_id = admissions.subject_id
+
+2. Admission-ICU Stay Relationship (1-to-many)
+   - Embedded icustays array within admission subdocument
+   - Rationale: Accessed with admissions, bounded 1-to-few
+   - SQL join: admissions.hadm_id = icustays.hadm_id
+
+3. Admission-Diagnosis Relationship (1-to-many)
+   - Embedded diagnoses_icd array within admission subdocument
+   - Denormalized d_icd_diagnoses table data (short_title, long_title)
+   - Rationale: Avoid repeated lookups; codes always read with diagnoses
+   - SQL join: diagnoses_icd.hadm_id = admissions.hadm_id
+   - SQL denorm: diagnoses_icd.icd9_code = d_icd_diagnoses.icd9_code
+
+4. NoteEvents as Separate Collection
+   - Not embedded in patients (as per design)
+   - Rationale: High cardinality (potentially many-many per patient),
+     large text fields would bloat patient documents
+   - SQL source: noteevents table
+   - Relationship: Many-to-1 with patients via subject_id/hadm_id
+
+### SQL Extraction Query Structure
+
+The extraction used PostgreSQL's jsonb_agg() and jsonb_build_object()
+to directly construct the nested JSON structure matching the MongoDB design:
+
+- Outer query: patients table with jsonb_agg
+  - Middle level: admissions subquery (jsonb_agg per subject_id)
+    - Inner level: icustays subquery (jsonb_agg per hadm_id)
+    - Inner level: diagnoses_icd with d_icd_diagnoses join
+
+This eliminated client-side transformation logic and ensured data
+consistency at the database level.
+
+======================================================================
+## PERFORMANCE METRICS
+
+Load Time: 0.51 seconds (first run)
+- Query execution time: ~0.3 seconds
+- Data insertion time: ~0.2 seconds
+
+Index Creation Time: Included in above
+Database Size: ~0.00 GB (current dataset is small - 100 patients)
+
+Performance Notes:
+- Batch insert with insert_many() for efficiency
+- Indexes created post-load for optimal insertion performance
+- Database currently optimized for read performance with strategic indexes
+
+======================================================================
+## TECHNICAL IMPLEMENTATION
+
+### Technologies Used
+- Database: MongoDB 7.0.25
+- Python Driver: pymongo
+- ETL Source: PostgreSQL 15
+- ETL Tool: Python 3.x
+
+### Scripts
+- extraction_query: export_query_PatientDocuments.sql
+- extraction_query: export_query_NoteEvents.sql
+- loading_script: scripts/load_to_mongodb.py
+- config: hardcoded in load_to_mongodb.py
+
+### Connection Details
+MongoDB:
+  - Host: localhost
+  - Port: 27018
+  - Username: admin
+  - Database: hospital_db_nosql
+  - Auth: SCRAM with admin database
+
+PostgreSQL:
+  - Host: localhost
+  - Port: 5432
+  - Username: admin
+  - Database: hospital_db
+  - Auth: password
+
+======================================================================
+## RECOMMENDATIONS FOR NEXT PHASES
+
+### For Person 5 (Validation & Performance Testing)
+
+1. Validation Queries to Consider:
+   - Verify total patient count (100)
+   - Verify total admission count (129)
+   - Compare data statistics between SQL and NoSQL
+   - Check for NULL values and data integrity
+   - Validate embedded arrays are fully populated
+
+2. Performance Test Scenarios:
+   - Find patient by subject_id
+   - Find all admissions for a patient
+   - Find all ICU stays across all admissions
+   - Find diagnoses by code across all patients
+   - Find notes by patient/admission
+   - Compare execution times vs. PostgreSQL equivalents
+
+3. Index Effectiveness:
+   - Monitor index usage during queries
+   - Consider compound indexes if needed
+   - Verify no missing indexes for common queries
+
+### For Full Production Deployment:
+
+1. Increase Data Volume:
+   - Current: 100 patients
+   - Target: Scale to 500MB+ as per requirements
+   - Person 3 should expand the PostgreSQL dataset
+   - Re-run extraction and loading with larger dataset
+
+2. Sharding Considerations:
+   - At 500MB+, consider sharding by subject_id
+   - Current single-server setup sufficient for testing
+
+3. Backup & Recovery:
+   - Implement MongoDB backup strategy
+   - Test recovery procedures
+
+4. Monitoring:
+   - Set up MongoDB monitoring (CPU, memory, disk)
+   - Track query performance metrics
+   - Monitor index effectiveness
+
+======================================================================
+## ISSUES & RESOLUTIONS
+
+None encountered during execution. Data loading proceeded without errors
+on the first run. Subsequent runs showed expected duplicate key errors
+(data already exists), confirming data persistence.
+
+======================================================================
+## CONCLUSION
+
+Person 4's data loading phase is complete. The NoSQL database is now
+populated with denormalized patient documents containing fully embedded
+admissions, ICU stays, and diagnoses. A separate noteevents collection
+contains clinical notes referenced by subject_id and hadm_id.
+
+All data has been loaded successfully, indexes have been created for
+optimal query performance, and the database is ready for validation
+(Person 5) and performance testing (Person 5).
+
+======================================================================
+Generated with load_to_mongodb.py
+Date: 2025-11-22
