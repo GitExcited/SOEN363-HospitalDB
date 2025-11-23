@@ -44,8 +44,11 @@ node_modules/
 .env.local
 
 # Large data files (Phase 2 scaling)
+scaled_JSON_output_patients.json
+scaled_JSON_output_updated.json
 scaled_JSON_output.json
 scaled_JSON_output_notes.json
+scaled_JSON_output_notes_updated.json
 sql/insert_scaled_*.sql
 
 # Large dataset files

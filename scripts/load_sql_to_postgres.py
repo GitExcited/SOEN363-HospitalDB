@@ -30,7 +30,7 @@ def connect_to_postgres():
         sys.exit(1)
 
 def load_sql_file(conn, sql_file, label):
-    """Load and execute SQL file"""
+    """Load and execute SQL file with batched INSERTs for better performance"""
     try:
         print(f"\n[LOAD] Reading {label} SQL file: {sql_file}")
 
@@ -41,31 +41,66 @@ def load_sql_file(conn, sql_file, label):
         file_size_mb = os.path.getsize(sql_file) / (1024 * 1024)
         print(f"  File size: {file_size_mb:.1f} MB")
 
-        print(f"[EXECUTE] Executing {label} SQL statements...")
+        print(f"[EXECUTE] Executing {label} SQL statements (batched mode)...")
         cursor = conn.cursor()
 
         start_time = datetime.now()
 
-        # Read and execute SQL file
+        # Read SQL file and parse statements
         with open(sql_file, 'r') as f:
             sql_content = f.read()
 
-        # Disable foreign key constraints for loading
-        cursor.execute("SET session_replication_role = 'replica'")
+        # Split by semicolon while respecting quoted strings
+        # Remove transaction control statements
+        lines = sql_content.split('\n')
+        clean_lines = []
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith('--'):
+                # Skip transaction control statements
+                if line.upper() not in ('BEGIN TRANSACTION;', 'SET CONSTRAINTS ALL DEFERRED;', 'COMMIT;'):
+                    clean_lines.append(line)
 
-        # Execute all statements
-        cursor.execute(sql_content)
+        # Rejoin and split by semicolon
+        full_content = ' '.join(clean_lines)
 
-        # Re-enable foreign key constraints
-        cursor.execute("SET session_replication_role = 'origin'")
+        # Split statements by semicolon but keep them complete
+        raw_statements = full_content.split(';')
+        insert_statements = []
+        for stmt in raw_statements:
+            stmt = stmt.strip()
+            if stmt and stmt.upper() != '':
+                insert_statements.append(stmt + ';')
 
-        conn.commit()
+        # Execute in batches of 100 for better performance
+        batch_size = 100
+        batch_count = (len(insert_statements) + batch_size - 1) // batch_size
+
+        print(f"  Total INSERT statements: {len(insert_statements):,}")
+        print(f"  Processing in {batch_count} batches of {batch_size}...")
+
+        for batch_num in range(0, len(insert_statements), batch_size):
+            batch = insert_statements[batch_num:batch_num + batch_size]
+            batch_sql = '; '.join(batch) + ';'
+
+            try:
+                cursor.execute(batch_sql)
+                conn.commit()
+
+                # Progress indicator
+                processed = min(batch_num + batch_size, len(insert_statements))
+                if processed % 1000 == 0 or processed == len(insert_statements):
+                    print(f"  ✓ Processed {processed:,}/{len(insert_statements):,} statements", end='\r')
+            except Exception as batch_error:
+                conn.rollback()
+                print(f"\n✗ Error in batch {batch_num // batch_size + 1}: {str(batch_error)[:100]}")
+                raise
 
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
 
-        print(f"✓ Successfully executed {label} SQL file")
-        print(f"  Duration: {duration:.2f} seconds")
+        print(f"\n✓ Successfully executed {label} SQL file")
+        print(f"  Duration: {duration:.2f} seconds ({duration/60:.1f} minutes)")
         cursor.close()
         return True
 

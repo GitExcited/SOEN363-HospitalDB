@@ -9,6 +9,13 @@ from datetime import datetime
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Load ICD9 code mapping
+CODE_MAPPING = {}
+mapping_file = os.path.join(PROJECT_ROOT, "icd9_code_mapping.json")
+if os.path.exists(mapping_file):
+    with open(mapping_file, 'r') as f:
+        CODE_MAPPING = json.load(f)
+
 def escape_sql_string(value):
     """Escape special characters in SQL strings"""
     if value is None:
@@ -20,6 +27,17 @@ def escape_sql_string(value):
     # Escape single quotes by doubling them
     escaped = str(value).replace("'", "''")
     return f"'{escaped}'"
+
+def pad_icd9_code(code):
+    """Map ICD9 code to exact format from reference table using mapping file"""
+    if code is None:
+        return None
+    # Convert to string and remove any whitespace
+    code_str = str(code).strip()
+    # Use mapping if available, otherwise return original
+    if code_str in CODE_MAPPING:
+        return CODE_MAPPING[code_str]
+    return code_str
 
 def load_json(json_file):
     """Load JSON file"""
@@ -117,7 +135,10 @@ def generate_sql_inserts(patients_data, output_file):
             # Insert diagnoses
             for diagnosis_icd in admission.get("diagnoses_icd", []):
                 seq_num = diagnosis_icd.get("seq_num")
-                icd9_code = escape_sql_string(diagnosis_icd.get("icd9_code"))
+                # Pad ICD9 code to 5 digits with leading zeros
+                raw_icd9_code = diagnosis_icd.get("icd9_code")
+                padded_icd9_code = pad_icd9_code(raw_icd9_code)
+                icd9_code = escape_sql_string(padded_icd9_code)
 
                 insert_stmt = f"""INSERT INTO diagnoses_icd (row_id, subject_id, hadm_id, seq_num, icd9_code) VALUES ({diagnoses_row_id}, {subject_id}, {hadm_id}, {seq_num}, {icd9_code});"""
                 inserts.append(insert_stmt)
@@ -180,8 +201,21 @@ def main():
     print("Convert scaled JSON files to PostgreSQL INSERT statements")
     print("=" * 70)
 
-    # Load patient data
-    patients_json = os.path.join(PROJECT_ROOT, "scaled_JSON_output.json")
+    # Load patient data (use latest version if available)
+    patients_json_new = os.path.join(PROJECT_ROOT, "scaled_JSON_output_patients.json")
+    patients_json_updated = os.path.join(PROJECT_ROOT, "scaled_JSON_output_updated.json")
+    patients_json_original = os.path.join(PROJECT_ROOT, "scaled_JSON_output.json")
+
+    if os.path.exists(patients_json_new):
+        patients_json = patients_json_new
+        print("[LOAD] Using NEW patients JSON with fixed ICD9 codes")
+    elif os.path.exists(patients_json_updated):
+        patients_json = patients_json_updated
+        print("[LOAD] Using updated JSON with cleaned ICD9 codes")
+    else:
+        patients_json = patients_json_original
+        print("[LOAD] Using original JSON")
+
     patients_data = load_json(patients_json)
 
     if not patients_data:
@@ -195,14 +229,30 @@ def main():
     os.makedirs(os.path.dirname(patients_sql), exist_ok=True)
     generate_sql_inserts(patients_data, patients_sql)
 
-    # Load noteevents data
-    noteevents_json = os.path.join(PROJECT_ROOT, "scaled_JSON_output_notes.json")
-    noteevents_data = load_json(noteevents_json)
+    # Load noteevents data (use original or updated - both are compatible)
+    # Note: No FK constraint issues with noteevents since it has no ICD9 code references
+    noteevents_json_updated = os.path.join(PROJECT_ROOT, "scaled_JSON_output_notes_updated.json")
+    noteevents_json_original = os.path.join(PROJECT_ROOT, "scaled_JSON_output_notes.json")
+
+    noteevents_data = []
+
+    if os.path.exists(noteevents_json_updated):
+        print("[LOAD] Using updated noteevents JSON")
+        noteevents_data = load_json(noteevents_json_updated)
+    elif os.path.exists(noteevents_json_original):
+        print("[LOAD] Using original noteevents JSON")
+        noteevents_data = load_json(noteevents_json_original)
+    else:
+        print("[LOAD] Note: No noteevents JSON file found")
+        print("[LOAD] Continuing with patients data only")
+        noteevents_data = []
 
     if noteevents_data:
         print(f"✓ Loaded {len(noteevents_data):,} note events")
         noteevents_sql = os.path.join(PROJECT_ROOT, "sql", "insert_scaled_noteevents.sql")
         load_noteevents_sql(noteevents_data, noteevents_sql)
+    else:
+        print("[INFO] Skipping noteevents SQL generation")
 
     print("\n" + "=" * 70)
     print("✓ SQL files generated successfully!")
