@@ -1,226 +1,281 @@
 ==================================================
 SOEN 363 ASSIGNEMENT PART 2 PERFORMANCE TEST REPORT
+==================================================
 comparing retrieval times for queries from part 1
 
 ----------------------------------------
 Testing: query 1 from part 1
-fetching result ...
-SQL time: 1.70 sec
-fetching result ...
-NO SQL time: 4.21 sec
-
-
-NOSQL is 148% slower than SQL
+SQL time: 0.45 sec
+NO SQL time: 2.08 sec
+NOSQL is 358% slower than SQL
 ----------------------------------------
 Testing: query 2 from part 1
-fetching result ...
-SQL time: 0.33 sec
-fetching result ...
-NO SQL time: 0.00 sec
-
-
-NOSQL is 99% faster than SQL
-----------------------------------------
-Testing: query 3 from part 1
-fetching result ...
-SQL time: 2.34 sec
-fetching result ...
-NO SQL time: 7.43 sec
-
-
-NOSQL is 217% slower than SQL
-----------------------------------------
-Testing: query 4 from part 1
-fetching result ...
-SQL time: 0.44 sec
-fetching result ...
-NO SQL time: 3.84 sec
-
-
-NOSQL is 766% slower than SQL
-----------------------------------------
-Testing: query 5 from part 1
-fetching result ...
-SQL time: 2.00 sec
-fetching result ...
-NO SQL time: 4.09 sec
-
-
-NOSQL is 104% slower than SQL
-----------------------------------------
-Testing: query 6 from part 1
-fetching result ...
-SQL time: 0.46 sec
-fetching result ...
-NO SQL time: 4.80 sec
-
-
-NOSQL is 951% slower than SQL
-----------------------------------------
-Testing: query 7 from part 1
-fetching result ...
-SQL time: 2.81 sec
-fetching result ...
-NO SQL time: 6.02 sec
-
-
-NOSQL is 115% slower than SQL
-----------------------------------------
-Testing: query 8 from part 1
-fetching result ...
-SQL time: 2.31 sec
-fetching result ...
-NO SQL time: 6.96 sec
-
-
-NOSQL is 201% slower than SQL
-----------------------------------------
-Testing: query 9 from part 1
-fetching result ...
-SQL time: 0.04 sec
-fetching result ...
-NO SQL time: 0.01 sec
-
-
-NOSQL is 73% faster than SQL
-----------------------------------------
-Testing: query 10 from part 1
-fetching result ...
-SQL time: 0.78 sec
-fetching result ...
-NO SQL time: 0.48 sec
-
-
-NOSQL is 39% faster than SQL
-----------------------------------------
-Testing: query 11 from part 1
-fetching result ...
-SQL time: 0.98 sec
-fetching result ...
-NO SQL time: 1.80 sec
-
-
-NOSQL is 83% slower than SQL
-----------------------------------------
-Testing: query 12 from part 1
-fetching result ...
-SQL time: 0.52 sec
-fetching result ...
-NO SQL time: 0.01 sec
-
-
-NOSQL is 99% faster than SQL
-----------------------------------------
-Testing: query 13 from part 1
-fetching result ...
-SQL time: 1.22 sec
-fetching result ...
-NO SQL time: 6.68 sec
-
-
-NOSQL is 449% slower than SQL
-----------------------------------------
-Testing: query 14 from part 1
-fetching result ...
-SQL time: 0.68 sec
-fetching result ...
-NO SQL time: 10.33 sec
-
-
-NOSQL is 1428% slower than SQL
-----------------------------------------
-Testing: query 15 from part 1
-fetching result ...
-Query exceeded 30 seconds : Aborting
-SQL time: 30.00 sec
-fetching result ...
-NO SQL time: 2.10 sec
-
-
-NOSQL is 93% faster than SQL
-----------------------------------------
-Testing: query 16 from part 1
-fetching result ...
-Query exceeded 30 seconds : Aborting
-SQL time: 30.00 sec
-fetching result ...
-NO SQL time: 2.06 sec
-
-
-NOSQL is 93% faster than SQL
-----------------------------------------
-Testing: query 17 from part 1
-fetching result ...
-Query exceeded 30 seconds : Aborting
-SQL time: 30.01 sec
-fetching result ...
-NO SQL time: 0.90 sec
-
-
-NOSQL is 97% faster than SQL
-----------------------------------------
-Testing: query 18 from part 1
-fetching result ...
-Query exceeded 30 seconds : Aborting
-SQL time: 30.01 sec
-fetching result ...
-NO SQL time: 0.67 sec
-
-
+SQL time: 1.05 sec
+NO SQL time: 0.03 sec
 NOSQL is 98% faster than SQL
 ----------------------------------------
+Testing: query 3 from part 1
+SQL time: 0.73 sec
+NO SQL time: 1.85 sec
+NOSQL is 154% slower than SQL
+----------------------------------------
+Testing: query 4 from part 1
+SQL time: 0.06 sec
+NO SQL time: 0.55 sec
+NOSQL is 795% slower than SQL
+----------------------------------------
+Testing: query 5 from part 1
+SQL time: 0.22 sec
+NO SQL time: 0.79 sec
+NOSQL is 253% slower than SQL
+----------------------------------------
+Testing: query 6 from part 1
+SQL time: 0.14 sec
+NO SQL time: 1.08 sec
+NOSQL is 662% slower than SQL
+----------------------------------------
+Testing: query 7 from part 1
+SQL time: 0.29 sec
+NO SQL time: 1.17 sec
+NOSQL is 298% slower than SQL
+----------------------------------------
+Testing: query 8 from part 1
+SQL time: 0.47 sec
+NO SQL time: 1.87 sec
+NOSQL is 295% slower than SQL
+----------------------------------------
+Testing: query 9 from part 1
+SQL time: 0.01 sec
+NO SQL time: 0.00 sec
+NOSQL is 40% faster than SQL
+----------------------------------------
+Testing: query 10 from part 1
+SQL time: 0.21 sec
+NO SQL time: 0.27 sec
+NOSQL is 28% slower than SQL
+----------------------------------------
+Testing: query 11 from part 1
+SQL time: 0.17 sec
+NO SQL time: 0.45 sec
+NOSQL is 169% slower than SQL
+----------------------------------------
+Testing: query 12 from part 1
+SQL time: 0.10 sec
+NO SQL time: 0.00 sec
+NOSQL is 98% faster than SQL
+----------------------------------------
+Testing: query 13 from part 1
+SQL time: 0.23 sec
+NO SQL time: 1.51 sec
+NOSQL is 544% slower than SQL
+----------------------------------------
+Testing: query 14 from part 1
+SQL time: 0.05 sec
+NO SQL time: 3.08 sec
+NOSQL is 6744% slower than SQL
+----------------------------------------
+Testing: query 15 from part 1
+SQL time: 0.19 sec
+NO SQL time: 0.48 sec
+NOSQL is 157% slower than SQL
+----------------------------------------
+Testing: query 16 from part 1
+SQL time: 0.12 sec
+NO SQL time: 0.39 sec
+NOSQL is 224% slower than SQL
+----------------------------------------
+Testing: query 17 from part 1
+SQL time: 0.02 sec
+NO SQL time: 0.11 sec
+NOSQL is 439% slower than SQL
+----------------------------------------
+Testing: query 18 from part 1
+SQL time: 0.01 sec
+NO SQL time: 0.11 sec
+NOSQL is 691% slower than SQL
+----------------------------------------
 Testing: query 19 from part 1
-fetching result ...
-Query exceeded 30 seconds : Aborting
-SQL time: 30.01 sec
-fetching result ...
-NO SQL time: 0.96 sec
-
-
-NOSQL is 97% faster than SQL
+SQL time: 0.06 sec
+NO SQL time: 0.11 sec
+NOSQL is 75% slower than SQL
 ----------------------------------------
 Testing: query 20 from part 1
-fetching result ...
-Query exceeded 30 seconds : Aborting
-SQL time: 30.01 sec
-fetching result ...
-NO SQL time: 0.03 sec
-
-
-NOSQL is 100% faster than SQL
+SQL time: 0.00 sec
+NO SQL time: 0.00 sec
+NOSQL is 5% faster than SQL
 ==================================================
 PERFORMANCE TEST COMPLETE RESULTS
 
-Q1: NOSQL is 148% slower than SQL
-Q2: NOSQL is 99% faster than SQL
-Q3: NOSQL is 217% slower than SQL
-Q4: NOSQL is 766% slower than SQL
-Q5: NOSQL is 104% slower than SQL
-Q6: NOSQL is 951% slower than SQL
-Q7: NOSQL is 115% slower than SQL
-Q8: NOSQL is 201% slower than SQL
-Q9: NOSQL is 73% faster than SQL
-Q10: NOSQL is 39% faster than SQL
-Q11: NOSQL is 83% slower than SQL
-Q12: NOSQL is 99% faster than SQL
-Q13: NOSQL is 449% slower than SQL
-Q14: NOSQL is 1428% slower than SQL
-Q15: NOSQL is 93% faster than SQL
-Q16: NOSQL is 93% faster than SQL
-Q17: NOSQL is 97% faster than SQL
-Q18: NOSQL is 98% faster than SQL
-Q19: NOSQL is 97% faster than SQL
-Q20: NOSQL is 100% faster than SQL
+Q1: NOSQL is 358% slower than SQL
+Q2: NOSQL is 98% faster than SQL
+Q3: NOSQL is 154% slower than SQL
+Q4: NOSQL is 795% slower than SQL
+Q5: NOSQL is 253% slower than SQL
+Q6: NOSQL is 662% slower than SQL
+Q7: NOSQL is 298% slower than SQL
+Q8: NOSQL is 295% slower than SQL
+Q9: NOSQL is 40% faster than SQL
+Q10: NOSQL is 28% slower than SQL
+Q11: NOSQL is 169% slower than SQL
+Q12: NOSQL is 98% faster than SQL
+Q13: NOSQL is 544% slower than SQL
+Q14: NOSQL is 6744% slower than SQL
+Q15: NOSQL is 157% slower than SQL
+Q16: NOSQL is 224% slower than SQL
+Q17: NOSQL is 439% slower than SQL
+Q18: NOSQL is 691% slower than SQL
+Q19: NOSQL is 75% slower than SQL
+Q20: NOSQL is 5% faster than SQL
 ----------------------------------------
- Average time difference: 1.7870959913764324
+ Average time difference: 5.82286057311144
 ==================================================
 ==================================================
-GENERAL PERFORMANCE TRENDS SUMMARY
+GENERAL QUERY PERFORMANCE TRENDS SUMMARY
 ==================================================
-Queries where MongoDB was faster: [2, 9, 10, 12, 15, 16, 17, 18, 19, 20]
-Queries where PostgreSQL was faster: [1, 3, 4, 5, 6, 7, 8, 11, 13, 14]
+Queries where MongoDB was faster: [2, 9, 12, 20]
+Queries where PostgreSQL was faster: [1, 3, 4, 5, 6, 7, 8, 10, 11, 13, 14, 15, 16, 17, 18, 19]
 
-MongoDB faster in 10 / 20 queries
-PostgreSQL faster in 10 / 20 queries
+MongoDB faster in 4 / 20 queries
+PostgreSQL faster in 16 / 20 queries
+
+==================================================
+==================================================
+INSERTION PERFORMANCE TESTING
+Comparing SQL vs NoSQL insert speeds
+
+----------------------------------------
+Testing: insertion batch 1
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.03 sec
+NOSQL is 581% slower than SQL
+----------------------------------------
+Testing: insertion batch 2
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 123% slower than SQL
+----------------------------------------
+Testing: insertion batch 3
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 201% slower than SQL
+----------------------------------------
+Testing: insertion batch 4
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 172% slower than SQL
+----------------------------------------
+Testing: insertion batch 5
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 138% slower than SQL
+----------------------------------------
+Testing: insertion batch 6
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 164% slower than SQL
+----------------------------------------
+Testing: insertion batch 7
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 189% slower than SQL
+----------------------------------------
+Testing: insertion batch 8
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 172% slower than SQL
+----------------------------------------
+Testing: insertion batch 9
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 160% slower than SQL
+----------------------------------------
+Testing: insertion batch 10
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 175% slower than SQL
+----------------------------------------
+Testing: insertion batch 11
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 262% slower than SQL
+----------------------------------------
+Testing: insertion batch 12
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 202% slower than SQL
+----------------------------------------
+Testing: insertion batch 13
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 157% slower than SQL
+----------------------------------------
+Testing: insertion batch 14
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 164% slower than SQL
+----------------------------------------
+Testing: insertion batch 15
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 120% slower than SQL
+----------------------------------------
+Testing: insertion batch 16
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 161% slower than SQL
+----------------------------------------
+Testing: insertion batch 17
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 233% slower than SQL
+----------------------------------------
+Testing: insertion batch 18
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 182% slower than SQL
+----------------------------------------
+Testing: insertion batch 19
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 179% slower than SQL
+----------------------------------------
+Testing: insertion batch 20
+SQL insert time: 0.00 sec
+NO SQL insert time: 0.00 sec
+NOSQL is 193% slower than SQL
+==================================================
+INSERTION TEST COMPLETE RESULTS
+
+Batch 1: NOSQL is 581% slower than SQL
+Batch 2: NOSQL is 123% slower than SQL
+Batch 3: NOSQL is 201% slower than SQL
+Batch 4: NOSQL is 172% slower than SQL
+Batch 5: NOSQL is 138% slower than SQL
+Batch 6: NOSQL is 164% slower than SQL
+Batch 7: NOSQL is 189% slower than SQL
+Batch 8: NOSQL is 172% slower than SQL
+Batch 9: NOSQL is 160% slower than SQL
+Batch 10: NOSQL is 175% slower than SQL
+Batch 11: NOSQL is 262% slower than SQL
+Batch 12: NOSQL is 202% slower than SQL
+Batch 13: NOSQL is 157% slower than SQL
+Batch 14: NOSQL is 164% slower than SQL
+Batch 15: NOSQL is 120% slower than SQL
+Batch 16: NOSQL is 161% slower than SQL
+Batch 17: NOSQL is 233% slower than SQL
+Batch 18: NOSQL is 182% slower than SQL
+Batch 19: NOSQL is 179% slower than SQL
+Batch 20: NOSQL is 193% slower than SQL
+----------------------------------------
+ Average insertion time difference: 1.9646487369997245
+==================================================
+==================================================
+GENERAL INSERTION PERFORMANCE TRENDS SUMMARY
+==================================================
+Insertion batches where MongoDB was faster: []
+Insertion batches where PostgreSQL was faster: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+
+MongoDB faster in 0 / 20 batches
+PostgreSQL faster in 20 / 20 batches
 
 ==================================================

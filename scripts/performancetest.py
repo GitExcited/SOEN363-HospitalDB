@@ -10,10 +10,14 @@ Runs equivalent queries on PostgreSQL and MongoDB and compares:
 
 import time
 import psycopg2
-from psycopg2.extras import DictCursor
 from pymongo import MongoClient
 import os
 import threading
+import random
+import datetime
+import csv
+import sys
+from uuid import uuid4
 class TimeoutError(Exception):
     pass
 
@@ -265,13 +269,13 @@ def fetch_q14_postgres(postgres_connection):
 def fetch_q15_postgres(postgres_connection):
     cursor = postgres_connection.cursor()
     cursor.execute("""
-                    SELECT * 
-                    FROM patients
-                    WHERE subject_id NOT IN (
-                        SELECT subject_id
-                        FROM icustays
+                    SELECT *
+                    FROM patients p
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM icustays i
+                        WHERE i.subject_id = p.subject_id
                     )
-                    limit 200
                    """)
     return cursor.fetchall()
 
@@ -868,7 +872,7 @@ mongo_queries = [
     fetch_q20_mongo
 ]
 
-def test(index, postgres_connection, mongo_connection):
+def test_query(index, postgres_connection, mongo_connection):
     log("-"*40)
     log(f"Testing: query {index+1} from part 1")
     print("fetching result ...")
@@ -895,13 +899,12 @@ def test(index, postgres_connection, mongo_connection):
 
 def run_query_tests(postgres, mongo):
     log("="*50)
-    log("SOEN 363 ASSIGNEMENT PART 2 PERFORMANCE TEST REPORT")
     log("comparing retrieval times for queries from part 1\n")
     all_percent_diff_times = []
     sum_percent_diff_time = 0
     
     for x in range(20):
-        all_percent_diff_times.append(test(x, postgres, mongo))
+        all_percent_diff_times.append(test_query(x, postgres, mongo))
         sum_percent_diff_time+=all_percent_diff_times[x]
     log("="*50)
     log("PERFORMANCE TEST COMPLETE RESULTS\n")
@@ -909,11 +912,11 @@ def run_query_tests(postgres, mongo):
         log(f"Q{x+1}: NOSQL is {abs(all_percent_diff_times[x]):.0%} {"faster" if all_percent_diff_times[x] < 0 else "slower"} than SQL" )
     average_percent_diff = (sum_percent_diff_time)/20
     log("-"*40)
-    log(f" Average time difference: {average_percent_diff}")
+    log(f" Average time difference: {average_percent_diff:.0%}")
     log("="*50)
 
     log("="*50)
-    log("GENERAL PERFORMANCE TRENDS SUMMARY")
+    log("GENERAL QUERY PERFORMANCE TRENDS SUMMARY")
     log("="*50)
 
     mongo_faster = []
@@ -933,20 +936,354 @@ def run_query_tests(postgres, mongo):
     log(f"PostgreSQL faster in {len(sql_faster)} / 20 queries\n")
 
     log("="*50)
+    return all_percent_diff_times
+
+def random_date(start_year=1920, end_year=2010):
+    return datetime.datetime(
+        random.randint(start_year, end_year),
+        random.randint(1, 12),
+        random.randint(1, 28),
+        random.randint(0, 23),
+        random.randint(0, 59)
+    )
 
 
+def generate_random_patient(subject_id=None):
+    if subject_id is None:
+        subject_id = random.randint(10000, 99999)
+
+    genders = ["M", "F"]
+
+    return {
+        "subject_id": subject_id,
+        "gender": random.choice(genders),
+        "dob": random_date(1920, 2010),
+        "admissions": []
+    }
 
 
+def generate_random_admission(subject_id, hadm_id=None):
+    if hadm_id is None:
+        hadm_id = random.randint(100000, 999999)
 
+    admittime = random_date(2010, 2023)
+    dischtime = admittime + datetime.timedelta(days=random.randint(1, 14))
+
+    insurances = ["Medicare", "Medicaid", "Private", "Self Pay"]
+    discharge_locations = ["HOME", "REHAB", "NURSING HOME", "DIED"]
+    admission_types = ["EMERGENCY", "URGENT", "ELECTIVE"]
+
+    return {
+        "hadm_id": hadm_id,
+        "admittime": admittime,
+        "dischtime": dischtime,
+        "admission_type": random.choice(admission_types),
+        "insurance": random.choice(insurances),
+        "discharge_location": random.choice(discharge_locations),
+        "diagnosis": "Random diagnosis " + str(random.randint(1, 5000)),
+        "icustays": [],
+        "diagnoses_icd": [],
+        "noteevents": []
+    }
+
+def generate_random_icustay(hadm_id, icustay_id=None):
+    if icustay_id is None:
+        icustay_id = random.randint(1000000, 9999999)
+
+    intime = random_date(2015, 2023)
+    outtime = intime + datetime.timedelta(days=random.randint(1, 7))
+
+    units = ["MICU", "SICU", "CCU", "NICU"]
+
+    return {
+        "icustay_id": icustay_id,
+        "hadm_id": hadm_id,
+        "intime": intime,
+        "outtime": outtime,
+        "first_careunit": random.choice(units),
+        "last_careunit": random.choice(units),
+        "los": (outtime - intime).total_seconds() / 86400
+    }
+
+
+def generate_random_diagnosis(hadm_id):
+    icd = f"{random.randint(1, 999)}.{random.randint(0, 99):02d}"
+    return {
+        "hadm_id": hadm_id,
+        "icd9_code": icd,
+        "short_title": "Auto short",
+        "long_title": "Auto long"
+    }
+
+
+def generate_random_noteevent(hadm_id, subject_id):
+    categories = ["Radiology", "Discharge summary", "Nursing", "ECG"]
+    sample_texts = [
+        "Patient stable.",
+        "Recommending follow-up.",
+        "Abnormal finding detected.",
+        "Chest-related symptoms."
+    ]
+
+    chartdate = random_date(2016, 2023)
+
+    return {
+        "hadm_id": hadm_id,
+        "subject_id": subject_id,
+        "chartdate": chartdate,
+        "storetime": chartdate + datetime.timedelta(hours=1),
+        "category": random.choice(categories),
+        "description": "AUTO GENERATED",
+        "text": random.choice(sample_texts),
+        "iserror": None
+    }
+
+def generate_full_random_patient(num_admissions=2, num_icu_per_admission=1,
+                                 num_diag_per_admission=3, num_notes_per_admission=3):
+    p = generate_random_patient()
+
+    for _ in range(num_admissions):
+        adm = generate_random_admission(p["subject_id"])
+
+        for _ in range(num_icu_per_admission):
+            adm["icustays"].append(generate_random_icustay(adm["hadm_id"]))
+
+        for _ in range(num_diag_per_admission):
+            adm["diagnoses_icd"].append(generate_random_diagnosis(adm["hadm_id"]))
+
+        for _ in range(num_notes_per_admission):
+            adm["noteevents"].append(
+                generate_random_noteevent(adm["hadm_id"], p["subject_id"])
+            )
+
+        p["admissions"].append(adm)
+
+    return p
+
+def insert_patient_postgres(pg, patient):
+    cur = pg.cursor()
+
+    cur.execute("""
+        INSERT INTO patients (subject_id, gender, dob, dod, dod_hosp, dod_ssn, expire_flag)
+        VALUES (%s, %s, %s, NULL, NULL, NULL, 0)
+    """, (
+        patient["subject_id"], patient["gender"], patient["dob"]
+    ))
+
+    for adm in patient["admissions"]:
+
+        cur.execute("""
+            INSERT INTO admissions (
+                subject_id, hadm_id, admittime, dischtime, deathtime,
+                admission_type, admission_location, discharge_location,
+                insurance, language, religion, marital_status, ethnicity,
+                edregtime, edouttime, diagnosis, hospital_expire_flag,
+                has_chartevents
+            )
+            VALUES (%s, %s, %s, %s, NULL,
+                    %s, 'ER', %s,
+                    %s, 'ENGLISH', 'CATHOLIC', 'SINGLE', 'WHITE',
+                    NULL, NULL, %s, 0, 0);
+        """, (
+            patient["subject_id"], adm["hadm_id"], adm["admittime"], adm["dischtime"],
+            adm["admission_type"], adm["discharge_location"], adm["insurance"],
+            adm["diagnosis"]
+        ))
+
+        for icu in adm["icustays"]:
+            cur.execute("""
+                INSERT INTO icustays (
+                    icustay_id, subject_id, hadm_id, intime, outtime,
+                    first_careunit, last_careunit, los
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                icu["icustay_id"], patient["subject_id"], adm["hadm_id"],
+                icu["intime"], icu["outtime"], icu["first_careunit"], icu["last_careunit"],
+                icu["los"]
+            ))
+
+        for diag in adm["diagnoses_icd"]:
+            cur.execute("""
+                INSERT INTO diagnoses_icd (subject_id, hadm_id, seq_num, icd9_code)
+                VALUES (%s, %s, %s, %s)
+            """, (
+                patient["subject_id"], adm["hadm_id"],
+                random.randint(1, 50), diag["icd9_code"]
+            ))
+
+        for note in adm["noteevents"]:
+            cur.execute("""
+                INSERT INTO noteevents (
+                    subject_id, hadm_id, chartdate, storetime,
+                    category, description, text, iserror
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, NULL)
+            """, (
+                note["subject_id"], note["hadm_id"],
+                note["chartdate"], note["storetime"],
+                note["category"], note["description"], note["text"]
+            ))
+
+    pg.commit()
+
+def insert_patient_mongo(mongo, patient):
+    mongo["patients"].insert_one(patient)
+
+    notes = []
+    for adm in patient["admissions"]:
+        for n in adm["noteevents"]:
+            notes.append(n)
+
+    if notes:
+        mongo["noteevents"].insert_many(notes)
+
+def test_insertions(index, postgres_connection, mongo_connection):
+    log("-"*40)
+    log(f"Testing: insertion batch {index+1}")
+    
+    # Generate a random patient record
+    patient = generate_full_random_patient(
+        num_admissions=2,
+        num_icu_per_admission=1,
+        num_diag_per_admission=3,
+        num_notes_per_admission=3
+    )
+
+    # Test PostgreSQL insertion
+    print("inserting into SQL ...")
+    (pg_result, pg_time) = run_and_time(insert_patient_postgres, postgres_connection, patient)
+    if isinstance(pg_result, TimeoutError):
+        log(pg_result)
+        pg_time = float('inf')  # treat timeout as infinite time
+    
+    log(f"SQL insert time: {pg_time:.4f} sec")
+
+    # Test MongoDB insertion
+    print("inserting into NOSQL ...")
+    (mongo_result, mongo_time) = run_and_time(insert_patient_mongo, mongo_connection, patient)
+    if isinstance(mongo_result, TimeoutError):
+        log(mongo_result)
+        mongo_time = float('inf')
+
+    log(f"NO SQL insert time: {mongo_time:.4f} sec")
+
+    print("\n")
+
+    if pg_time == float('inf') and mongo_time == float('inf'):
+        percent_diff = 0
+    else:
+        percent_diff = (mongo_time - pg_time) / pg_time if pg_time != 0 else 0
+
+    log(f"NOSQL is {abs(percent_diff):.0%} {'faster' if percent_diff < 0 else 'slower'} than SQL")
+
+    return percent_diff
+
+def run_insertion_tests(postgres, mongo, batches=20):
+    log("="*50)
+    log("INSERTION PERFORMANCE TESTING")
+    log("Comparing SQL vs NoSQL insert speeds\n")
+
+    all_percent_diff = []
+    total = 0
+
+    for i in range(batches):
+        diff = test_insertions(i, postgres, mongo)
+        all_percent_diff.append(diff)
+        total += diff
+
+    log("="*50)
+    log("INSERTION TEST COMPLETE RESULTS\n")
+
+    for i, diff in enumerate(all_percent_diff):
+        log(f"Batch {i+1}: NOSQL is {abs(diff):.0%} {'faster' if diff < 0 else 'slower'} than SQL")
+
+    avg = total / batches
+    log("-"*40)
+    log(f" Average insertion time difference: {avg:.0%}")
+    log("="*50)
+
+    # ---- GENERAL TRENDS ----
+    log("="*50)
+    log("GENERAL INSERTION PERFORMANCE TRENDS SUMMARY")
+    log("="*50)
+
+    mongo_faster = []
+    sql_faster = []
+
+    for i, diff in enumerate(all_percent_diff):
+        if diff < 0:
+            mongo_faster.append(i + 1)
+        else:
+            sql_faster.append(i + 1)
+
+    log(f"Insertion batches where MongoDB was faster: {mongo_faster}")
+    log(f"Insertion batches where PostgreSQL was faster: {sql_faster}")
+    log("")
+
+    log(f"MongoDB faster in {len(mongo_faster)} / {batches} batches")
+    log(f"PostgreSQL faster in {len(sql_faster)} / {batches} batches\n")
+
+    log("="*50)
+    return all_percent_diff
 
 def main():
     postgres = connect_to_postgres()
     mongo = connect_to_mongo()
 
+    log("="*50)
+    log("SOEN 363 ASSIGNEMENT PART 2 PERFORMANCE TEST REPORT")
     run_query_tests(postgres, mongo)
+    run_insertion_tests(postgres, mongo)
 
     with open("reports/performance_report.txt", "w") as f:
         f.write("".join(report_log))
 
+
 if __name__ == "__main__":
-    main()
+
+    if len(sys.argv) != 3:
+        print("Usage: python performancetest.py <test_number> <query|insert>")
+        sys.exit(1)
+
+    test_number = sys.argv[1]
+    mode = sys.argv[2].lower()
+
+    if mode not in ("query", "insert"):
+        print("Mode must be 'query' or 'insert'")
+        sys.exit(1)
+
+    postgres = connect_to_postgres()
+    mongo = connect_to_mongo()
+
+    # -------------------------------
+    # SELECT WHICH TEST TO RUN
+    # -------------------------------
+    if mode == "query":
+        print("Running QUERY performance tests...")
+        results = run_query_tests(postgres, mongo)
+        outfile = f"reports/performance_test_results/performance_test{test_number}_query.csv"
+    else:
+        print("Running INSERTION performance tests...")
+        results = run_insertion_tests(postgres, mongo)
+        outfile = f"reports/performance_test_results/performance_test{test_number}_insert.csv"
+
+    postgres.close()
+
+    # -------------------------------
+    # EXPORT RESULTS TO CSV
+    # -------------------------------
+    with open(outfile, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+
+        if mode == "query":
+            writer.writerow(["Query Number", "Percent Difference"])
+            for i, diff in enumerate(results):
+                writer.writerow([i + 1, round(diff*100, 0)])
+
+        else:  # insertion mode
+            writer.writerow(["Batch Number", "Percent Difference"])
+            for i, diff in enumerate(results):
+                writer.writerow([i + 1, round(diff*100, 0)])
+
+    print(f"\nSaved results to {outfile}")
