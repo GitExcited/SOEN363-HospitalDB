@@ -1,0 +1,226 @@
+==================================================
+SOEN 363 ASSIGNEMENT PART 2 PERFORMANCE TEST REPORT
+comparing retrieval times for queries from part 1
+
+----------------------------------------
+Testing: query 1 from part 1
+fetching result ...
+SQL time: 1.70 sec
+fetching result ...
+NO SQL time: 4.21 sec
+
+
+NOSQL is 148% slower than SQL
+----------------------------------------
+Testing: query 2 from part 1
+fetching result ...
+SQL time: 0.33 sec
+fetching result ...
+NO SQL time: 0.00 sec
+
+
+NOSQL is 99% faster than SQL
+----------------------------------------
+Testing: query 3 from part 1
+fetching result ...
+SQL time: 2.34 sec
+fetching result ...
+NO SQL time: 7.43 sec
+
+
+NOSQL is 217% slower than SQL
+----------------------------------------
+Testing: query 4 from part 1
+fetching result ...
+SQL time: 0.44 sec
+fetching result ...
+NO SQL time: 3.84 sec
+
+
+NOSQL is 766% slower than SQL
+----------------------------------------
+Testing: query 5 from part 1
+fetching result ...
+SQL time: 2.00 sec
+fetching result ...
+NO SQL time: 4.09 sec
+
+
+NOSQL is 104% slower than SQL
+----------------------------------------
+Testing: query 6 from part 1
+fetching result ...
+SQL time: 0.46 sec
+fetching result ...
+NO SQL time: 4.80 sec
+
+
+NOSQL is 951% slower than SQL
+----------------------------------------
+Testing: query 7 from part 1
+fetching result ...
+SQL time: 2.81 sec
+fetching result ...
+NO SQL time: 6.02 sec
+
+
+NOSQL is 115% slower than SQL
+----------------------------------------
+Testing: query 8 from part 1
+fetching result ...
+SQL time: 2.31 sec
+fetching result ...
+NO SQL time: 6.96 sec
+
+
+NOSQL is 201% slower than SQL
+----------------------------------------
+Testing: query 9 from part 1
+fetching result ...
+SQL time: 0.04 sec
+fetching result ...
+NO SQL time: 0.01 sec
+
+
+NOSQL is 73% faster than SQL
+----------------------------------------
+Testing: query 10 from part 1
+fetching result ...
+SQL time: 0.78 sec
+fetching result ...
+NO SQL time: 0.48 sec
+
+
+NOSQL is 39% faster than SQL
+----------------------------------------
+Testing: query 11 from part 1
+fetching result ...
+SQL time: 0.98 sec
+fetching result ...
+NO SQL time: 1.80 sec
+
+
+NOSQL is 83% slower than SQL
+----------------------------------------
+Testing: query 12 from part 1
+fetching result ...
+SQL time: 0.52 sec
+fetching result ...
+NO SQL time: 0.01 sec
+
+
+NOSQL is 99% faster than SQL
+----------------------------------------
+Testing: query 13 from part 1
+fetching result ...
+SQL time: 1.22 sec
+fetching result ...
+NO SQL time: 6.68 sec
+
+
+NOSQL is 449% slower than SQL
+----------------------------------------
+Testing: query 14 from part 1
+fetching result ...
+SQL time: 0.68 sec
+fetching result ...
+NO SQL time: 10.33 sec
+
+
+NOSQL is 1428% slower than SQL
+----------------------------------------
+Testing: query 15 from part 1
+fetching result ...
+Query exceeded 30 seconds : Aborting
+SQL time: 30.00 sec
+fetching result ...
+NO SQL time: 2.10 sec
+
+
+NOSQL is 93% faster than SQL
+----------------------------------------
+Testing: query 16 from part 1
+fetching result ...
+Query exceeded 30 seconds : Aborting
+SQL time: 30.00 sec
+fetching result ...
+NO SQL time: 2.06 sec
+
+
+NOSQL is 93% faster than SQL
+----------------------------------------
+Testing: query 17 from part 1
+fetching result ...
+Query exceeded 30 seconds : Aborting
+SQL time: 30.01 sec
+fetching result ...
+NO SQL time: 0.90 sec
+
+
+NOSQL is 97% faster than SQL
+----------------------------------------
+Testing: query 18 from part 1
+fetching result ...
+Query exceeded 30 seconds : Aborting
+SQL time: 30.01 sec
+fetching result ...
+NO SQL time: 0.67 sec
+
+
+NOSQL is 98% faster than SQL
+----------------------------------------
+Testing: query 19 from part 1
+fetching result ...
+Query exceeded 30 seconds : Aborting
+SQL time: 30.01 sec
+fetching result ...
+NO SQL time: 0.96 sec
+
+
+NOSQL is 97% faster than SQL
+----------------------------------------
+Testing: query 20 from part 1
+fetching result ...
+Query exceeded 30 seconds : Aborting
+SQL time: 30.01 sec
+fetching result ...
+NO SQL time: 0.03 sec
+
+
+NOSQL is 100% faster than SQL
+==================================================
+PERFORMANCE TEST COMPLETE RESULTS
+
+Q1: NOSQL is 148% slower than SQL
+Q2: NOSQL is 99% faster than SQL
+Q3: NOSQL is 217% slower than SQL
+Q4: NOSQL is 766% slower than SQL
+Q5: NOSQL is 104% slower than SQL
+Q6: NOSQL is 951% slower than SQL
+Q7: NOSQL is 115% slower than SQL
+Q8: NOSQL is 201% slower than SQL
+Q9: NOSQL is 73% faster than SQL
+Q10: NOSQL is 39% faster than SQL
+Q11: NOSQL is 83% slower than SQL
+Q12: NOSQL is 99% faster than SQL
+Q13: NOSQL is 449% slower than SQL
+Q14: NOSQL is 1428% slower than SQL
+Q15: NOSQL is 93% faster than SQL
+Q16: NOSQL is 93% faster than SQL
+Q17: NOSQL is 97% faster than SQL
+Q18: NOSQL is 98% faster than SQL
+Q19: NOSQL is 97% faster than SQL
+Q20: NOSQL is 100% faster than SQL
+----------------------------------------
+ Average time difference: 1.7870959913764324
+==================================================
+==================================================
+GENERAL PERFORMANCE TRENDS SUMMARY
+==================================================
+Queries where MongoDB was faster: [2, 9, 10, 12, 15, 16, 17, 18, 19, 20]
+Queries where PostgreSQL was faster: [1, 3, 4, 5, 6, 7, 8, 11, 13, 14]
+
+MongoDB faster in 10 / 20 queries
+PostgreSQL faster in 10 / 20 queries
+
+==================================================

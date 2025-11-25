@@ -13,6 +13,9 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from pymongo import MongoClient
 import os
+import threading
+class TimeoutError(Exception):
+    pass
 
 POSTGRES_CONFIG = {
     "host": os.getenv("PG_HOST", "localhost"),
@@ -53,13 +56,28 @@ def connect_to_mongo():
         print(f"Connection Failed: {e}")
         exit(1)
 
-
 def run_and_time(func, *args):
-
     start = time.perf_counter()
-    result = func(*args)
+
+    result_holder = {"result": None}
+    def target():
+        try:
+            result_holder["result"] = func(*args)
+        except Exception as e:
+            result_holder["result"] = e
+
+    thread = threading.Thread(target=target)
+    thread.daemon = True
+    thread.start()
+    thread.join(30)  # 30 second limit
+
     end = time.perf_counter()
-    return result, (end - start)
+
+    # If still running after timeout
+    if thread.is_alive():
+        return TimeoutError("Query exceeded 30 seconds : Aborting"), (end - start)
+
+    return result_holder["result"], (end - start)
 
 # Part 1 queries in postgres
 
@@ -856,9 +874,15 @@ def test(index, postgres_connection, mongo_connection):
     log(f"Testing: query {index+1} from part 1")
     print("fetching result ...")
     (postgres_result, postgres_time) = run_and_time(postgres_queries[index], postgres_connection)
+    if isinstance(postgres_result, TimeoutError):
+        log(postgres_result)
+    postgres_result = []
     log(f"SQL time: {postgres_time:.2f} sec")
     print("fetching result ...")
     (mongo_result, mongo_time) = run_and_time(mongo_queries[index], mongo_connection)
+    if isinstance(mongo_result, TimeoutError):
+        log(mongo_result)
+    mongo_result = []
     log(f"NO SQL time: {mongo_time:.2f} sec")
     
     if len(mongo_result) != len(postgres_result):
@@ -889,6 +913,28 @@ def run_tests(postgres, mongo):
     log(f" Average time difference: {average_percent_diff}")
     log("="*50)
 
+    log("="*50)
+    log("GENERAL PERFORMANCE TRENDS SUMMARY")
+    log("="*50)
+
+    mongo_faster = []
+    sql_faster = []
+
+    for i, diff in enumerate(all_percent_diff_times):
+        if diff < 0:
+            mongo_faster.append(i + 1)
+        else:
+            sql_faster.append(i + 1)
+
+    log(f"Queries where MongoDB was faster: {mongo_faster}")
+    log(f"Queries where PostgreSQL was faster: {sql_faster}")
+    log("")
+
+    log(f"MongoDB faster in {len(mongo_faster)} / 20 queries")
+    log(f"PostgreSQL faster in {len(sql_faster)} / 20 queries\n")
+
+    log("="*50)
+
 
 def main():
     postgres = connect_to_postgres()
@@ -896,7 +942,6 @@ def main():
 
     run_tests(postgres, mongo)
 
-    postgres.close()
     with open("reports/performance_report.txt", "w") as f:
         f.write("".join(report_log))
 
