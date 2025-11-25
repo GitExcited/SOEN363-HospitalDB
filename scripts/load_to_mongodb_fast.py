@@ -105,6 +105,20 @@ def load_patients_streaming(postgres_conn, mongo_db):
         diagnose_col_idx = {col: i for i, col in enumerate(diagnose_cols)}
         diag_hadm_idx = diagnose_col_idx['hadm_id']
 
+        # Get ICD9 titles
+        cursor.execute("SELECT * FROM d_icd_diagnoses")
+        icd_titles = cursor.fetchall()
+        title_cols = [desc[0] for desc in cursor.description]
+        title_idx = {col: i for i, col in enumerate(title_cols)}
+
+        titles_by_code = {}
+        for row in icd_titles:
+            code = row[title_idx['icd9_code']]
+            titles_by_code[code] = {
+                "short_title": row[title_idx['short_title']],
+                "long_title": row[title_idx['long_title']]
+            }
+
         # Index by hadm_id for fast lookup
         admissions_by_subject = {}
         for adm in admissions:
@@ -164,6 +178,14 @@ def load_patients_streaming(postgres_conn, mongo_db):
                     for col, idx in diagnose_col_idx.items():
                         if col not in ['row_id', 'subject_id', 'hadm_id']:
                             diag_doc[col] = diag[idx]
+
+                    icd_code = diag[diagnose_col_idx['icd9_code']]         
+                    if icd_code in titles_by_code:
+                        diag_doc['short_title'] = titles_by_code[icd_code]['short_title']
+                        diag_doc['long_title'] = titles_by_code[icd_code]['long_title']
+                    else:
+                        diag_doc['short_title'] = None
+                        diag_doc['long_title'] = None
                     adm_doc['diagnoses_icd'].append(diag_doc)
 
                 embedded_admissions.append(adm_doc)
