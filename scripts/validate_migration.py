@@ -24,7 +24,7 @@ POSTGRES_CONFIG = {
 
 MONGO_URI = "mongodb://admin:admin@localhost:27018/?authSource=admin"
 
-MONGO_DB_NAME = "MONGO_DB", "hospital_db_nosql"
+MONGO_DB_NAME = "hospital_db_nosql"
 
 report_log = []
 

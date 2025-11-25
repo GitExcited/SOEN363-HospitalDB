@@ -681,7 +681,6 @@ def fetch_q15_mongo(mongo_connection):
     ])
     return list(cursor)
 
-
 def fetch_q16_mongo(mongo_connection):
     cursor = mongo_connection["noteevents"].aggregate([
         {"$match": {"category": "Radiology"}},
@@ -894,7 +893,7 @@ def test(index, postgres_connection, mongo_connection):
     return percent_diff_in_time
 
 
-def run_tests(postgres, mongo):
+def run_query_tests(postgres, mongo):
     log("="*50)
     log("SOEN 363 ASSIGNEMENT PART 2 PERFORMANCE TEST REPORT")
     log("comparing retrieval times for queries from part 1\n")
@@ -936,11 +935,15 @@ def run_tests(postgres, mongo):
     log("="*50)
 
 
+
+
+
+
 def main():
     postgres = connect_to_postgres()
     mongo = connect_to_mongo()
 
-    run_tests(postgres, mongo)
+    run_query_tests(postgres, mongo)
 
     with open("reports/performance_report.txt", "w") as f:
         f.write("".join(report_log))

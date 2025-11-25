@@ -1,48 +1,428 @@
-[POSTGRES] Connecting...
-✓ Connected
 
-[MONGO] Connecting...
-✓ Connected
 
-==================================================
-RUNNING PERFORMANCE TEST SUITE
 
-==================================================
-TEST: Recent Admissions (>= 2100)
+========================================
+Verifying patient count
 
-PostgreSQL time: 0.8256 seconds
-MongoDB time:    1.8577 seconds
-Comparing result size for: Recent Admissions (>= 2100)
-  PostgreSQL rows = 280500
-  MongoDB docs    = 280500
-  [PASS] Row/document count matches
+280500 patients found in SQL DB
+(0.39831879106350243) seconds
 
-Mongo speedup vs SQL: 0.44x
 
-==================================================
-TEST: ICU Stay Frequency
+280500 patients found in NOSQL DB
+(3.9050536249997094) seconds
 
-PostgreSQL time: 0.8450 seconds
-MongoDB time:    1.8592 seconds
-Comparing result size for: ICU Stay Frequency
-  PostgreSQL rows = 280500
-  MongoDB docs    = 280500
-  [PASS] Row/document count matches
 
-Mongo speedup vs SQL: 0.45x
+[Pass]
+========================================
+Verifying admission count
 
-==================================================
-TEST: Most Common Diagnoses
+280500 admmissions found in SQL DB
+(1.7692220419412479) seconds
 
-PostgreSQL time: 0.1978 seconds
-MongoDB time:    0.9666 seconds
-Comparing result size for: Most Common Diagnoses
-  PostgreSQL rows = 20
-  MongoDB docs    = 20
-  [PASS] Row/document count matches
 
-Mongo speedup vs SQL: 0.20x
+280500 admissions found in NOSQL DB
+(1.683330750092864) seconds
 
-==================================================
-PERFORMANCE TESTING COMPLETE
-==================================================
+
+[Pass]
+========================================
+Verifying diagnosis count
+
+1262759 diagnoses found in SQL DB
+(0.9490699170855805) seconds
+
+
+1262759 diagnoses found in NOSQL DB
+(2.3882690420141444) seconds
+
+
+[Pass]
+========================================
+Verifying icu stay count
+
+280500 icu stays found in SQL DB
+(0.11145212489645928) seconds
+
+
+280500 icu stays found in NOSQL DB
+(1.8901516660116613) seconds
+
+
+[Pass]
+========================================
+Verifying note event count
+
+139500 note events found in SQL DB
+(0.8263155000749975) seconds
+
+
+139500 patients found in NOSQL DB
+(0.49756912502925843) seconds
+
+
+[Pass]
+
+
+
+========================================
+Running ALL Required Field Validations
+
+========================================
+Validating Patient Fields in MongoDB
+
+Patient field validation: PASSED
+
+
+========================================
+Validating Admission Fields in NOSQL DB...
+
+Admission field validation: PASSED
+['hadm_id', 'admittime', 'dischtime', 'diagnosis', 'icustays', 'diagnoses_icd'] found in NOSQL DB
+
+
+========================================
+Validating ICU Stay Fields in NOSQL DB...
+
+ICU Stay field validation: PASSED
+['icustay_id', 'intime', 'outtime', 'los'] found in NOSQL DB
+
+
+========================================
+Validating Diagnosis Fields in NOSQL DB...
+
+Diagnosis field validation: PASSED
+['icd9_code', 'short_title', 'long_title'] found in NOSQL DB
+
+
+========================================
+Validating Note Event Fields in NOSQL DB...
+
+Note Event field validation: PASSED
+['subject_id', 'hadm_id', 'chartdate', 'category', 'text'] found in NOSQL DB
+
+
+========================================
+PASSED: All required fields found
+========================================
+
+
+
+
+========================================
+Validating Nesting in NO SQL DB
+Selected a random sample of 100 patients in SQL DB
+
+
+[PASS] all nested fields for patient: subject_id=10002231, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002232, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002233, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002234, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002235, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002236, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002237, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002238, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002239, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002240, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002241, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002242, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002243, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002244, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002245, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002246, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002247, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002248, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002249, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002250, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002251, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002252, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002253, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002254, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002255, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002256, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002257, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002258, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002259, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002260, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002261, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002262, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002263, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002264, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002265, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002266, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002267, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002268, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002269, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002270, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002271, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002272, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002273, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002274, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002275, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002276, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002277, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002278, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002279, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002280, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002281, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002282, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002283, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002284, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002285, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002286, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002287, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002288, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002289, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002290, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002291, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002292, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002293, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002294, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002295, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002296, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002297, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002298, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002299, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002300, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002301, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002302, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002303, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002304, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002305, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002306, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002307, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002308, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002309, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002310, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002311, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002312, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002313, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002314, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002315, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002316, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002317, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002318, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002319, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002320, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002321, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002322, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002323, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002324, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002325, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002326, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10002327, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10007566, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10007567, found
+
+ ========================================
+[PASS] all nested fields for patient: subject_id=10007568, found
+
+ ========================================
+
+----------------------------------------
+Sample size: 100 patients
+Nesting failures: 0
+Nesting validation: PASSED
+----------------------------------------
+
+
+
+
+
+
+
