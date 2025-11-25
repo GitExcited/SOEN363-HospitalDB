@@ -22,11 +22,9 @@ POSTGRES_CONFIG = {
     "password": os.getenv("PG_PASSWORD", "admin"),
 }
 
-MONGO_URI = os.getenv(
-    "MONGO_URI",
-    "mongodb://admin:admin@localhost:27018/?authSource=admin"
-)
-MONGO_DB_NAME = os.getenv("MONGO_DB", "hospital_db_nosql") 
+MONGO_URI = "mongodb://admin:admin@localhost:27018/?authSource=admin"
+
+MONGO_DB_NAME = "MONGO_DB", "hospital_db_nosql"
 
 report_log = []
 
