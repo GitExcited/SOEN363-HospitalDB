@@ -1,0 +1,6 @@
+test_name,rows_inserted,duration_seconds,insert_type,timestamp
+batch_insert_1000,1000,0.012734,batch,2025-11-26T00:49:32.543661
+batch_insert_5000,5000,0.040795,batch,2025-11-26T00:49:32.602809
+batch_insert_10000,10000,0.068588,batch,2025-11-26T00:49:32.714195
+batch_insert_20000,20000,0.135473,batch,2025-11-26T00:49:32.936285
+batch_insert_50000,50000,0.395207,batch,2025-11-26T00:49:33.542167

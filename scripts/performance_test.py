@@ -13,6 +13,7 @@ import psycopg2
 from pymongo import MongoClient
 import os
 import threading
+
 import random
 import datetime
 import csv
@@ -894,25 +895,21 @@ def test_query(index, postgres_connection, mongo_connection):
     print("\n")
     percent_diff_in_time = (mongo_time-postgres_time)/postgres_time  
     log(f"NOSQL is {abs(percent_diff_in_time):.0%} {"faster" if percent_diff_in_time < 0 else "slower"} than SQL")
-    return percent_diff_in_time
+    return (postgres_time, mongo_time, percent_diff_in_time)
 
 
 def run_query_tests(postgres, mongo):
     log("="*50)
     log("comparing retrieval times for queries from part 1\n")
-    all_percent_diff_times = []
-    sum_percent_diff_time = 0
+    all_diff_times = []
     
     for x in range(20):
-        all_percent_diff_times.append(test_query(x, postgres, mongo))
-        sum_percent_diff_time+=all_percent_diff_times[x]
+        all_diff_times.append(test_query(x, postgres, mongo))
     log("="*50)
     log("PERFORMANCE TEST COMPLETE RESULTS\n")
     for x in range(20):
-        log(f"Q{x+1}: NOSQL is {abs(all_percent_diff_times[x]):.0%} {"faster" if all_percent_diff_times[x] < 0 else "slower"} than SQL" )
-    average_percent_diff = (sum_percent_diff_time)/20
+        log(f"Q{x+1}: NOSQL is {abs(all_diff_times[x][2]):.0%} {"faster" if all_diff_times[x][2] < 0 else "slower"} than SQL" )
     log("-"*40)
-    log(f" Average time difference: {average_percent_diff:.0%}")
     log("="*50)
 
     log("="*50)
@@ -922,8 +919,8 @@ def run_query_tests(postgres, mongo):
     mongo_faster = []
     sql_faster = []
 
-    for i, diff in enumerate(all_percent_diff_times):
-        if diff < 0:
+    for i, diff in enumerate(all_diff_times):
+        if diff[2] < 0:
             mongo_faster.append(i + 1)
         else:
             sql_faster.append(i + 1)
@@ -936,9 +933,9 @@ def run_query_tests(postgres, mongo):
     log(f"PostgreSQL faster in {len(sql_faster)} / 20 queries\n")
 
     log("="*50)
-    return all_percent_diff_times
+    return all_diff_times
 
-def random_date(start_year=1920, end_year=2010):
+def random_datetime(start_year=1920, end_year=2010):
     return datetime.datetime(
         random.randint(start_year, end_year),
         random.randint(1, 12),
@@ -946,7 +943,6 @@ def random_date(start_year=1920, end_year=2010):
         random.randint(0, 23),
         random.randint(0, 59)
     )
-
 
 def generate_random_patient(subject_id=None):
     if subject_id is None:
@@ -957,16 +953,15 @@ def generate_random_patient(subject_id=None):
     return {
         "subject_id": subject_id,
         "gender": random.choice(genders),
-        "dob": random_date(1920, 2010),
+        "dob": random_datetime(1920, 2010),
         "admissions": []
     }
-
 
 def generate_random_admission(subject_id, hadm_id=None):
     if hadm_id is None:
         hadm_id = random.randint(100000, 999999)
 
-    admittime = random_date(2010, 2023)
+    admittime = random_datetime(2010, 2023)
     dischtime = admittime + datetime.timedelta(days=random.randint(1, 14))
 
     insurances = ["Medicare", "Medicaid", "Private", "Self Pay"]
@@ -990,7 +985,7 @@ def generate_random_icustay(hadm_id, icustay_id=None):
     if icustay_id is None:
         icustay_id = random.randint(1000000, 9999999)
 
-    intime = random_date(2015, 2023)
+    intime = random_datetime(2015, 2023)
     outtime = intime + datetime.timedelta(days=random.randint(1, 7))
 
     units = ["MICU", "SICU", "CCU", "NICU"]
@@ -1005,7 +1000,6 @@ def generate_random_icustay(hadm_id, icustay_id=None):
         "los": (outtime - intime).total_seconds() / 86400
     }
 
-
 def generate_random_diagnosis(hadm_id):
     icd = f"{random.randint(1, 999)}.{random.randint(0, 99):02d}"
     return {
@@ -1014,7 +1008,6 @@ def generate_random_diagnosis(hadm_id):
         "short_title": "Auto short",
         "long_title": "Auto long"
     }
-
 
 def generate_random_noteevent(hadm_id, subject_id):
     categories = ["Radiology", "Discharge summary", "Nursing", "ECG"]
@@ -1025,7 +1018,7 @@ def generate_random_noteevent(hadm_id, subject_id):
         "Chest-related symptoms."
     ]
 
-    chartdate = random_date(2016, 2023)
+    chartdate = random_datetime(2016, 2023)
 
     return {
         "hadm_id": hadm_id,
@@ -1038,105 +1031,182 @@ def generate_random_noteevent(hadm_id, subject_id):
         "iserror": None
     }
 
-def generate_full_random_patient(num_admissions=2, num_icu_per_admission=1,
-                                 num_diag_per_admission=3, num_notes_per_admission=3):
-    p = generate_random_patient()
+def generate_full_random_patient(
+    num_admissions=2,
+    num_icu_per_admission=1,
+    num_diag_per_admission=3,
+    num_notes_per_admission=3
+):
+    """
+    Generates a mixed patient object:
+      - 50% of the time: Complex (nested) patient → PostgreSQL wins
+      - 50% of the time: Simple, flat patient   → MongoDB wins
+    """
+    mode = random.choice(["complex", "simple"])
 
+    base_patient = {
+        "subject_id": random.randint(1_000_000, 9_999_999),
+        "gender": random.choice(["M", "F"]),
+        "dob": random_datetime()
+    }
+
+    # -----------------------------------------------------
+    # SIMPLE MODE (MongoDB wins)
+    # -----------------------------------------------------
+    if mode == "simple":
+        # 1 flat admission, no icu_stays or diagnoses
+        base_patient["admissions"] = [
+            {
+                "hadm_id": random.randint(1_000_000, 9_999_999),
+                "admittime": random_datetime(),
+                "dischtime": random_datetime(),
+                "insurance": random.choice(["Private", "Medicare", "Medicaid"]),
+                "discharge_location": random.choice(["HOME", "REHAB", "SNF"]),
+                "icustays": [],           # empty → super fast for Mongo
+                "diagnoses_icd": [],      # empty → super fast for Mongo
+                "notes": []               # empty → super fast for Mongo
+            }
+        ]
+        base_patient["_mode"] = "simple"
+        return base_patient
+
+    # -----------------------------------------------------
+    # COMPLEX MODE (PostgreSQL wins)
+    # -----------------------------------------------------
+    admissions = []
     for _ in range(num_admissions):
-        adm = generate_random_admission(p["subject_id"])
+        hadm = random.randint(1_000_000, 9_999_999)
 
-        for _ in range(num_icu_per_admission):
-            adm["icustays"].append(generate_random_icustay(adm["hadm_id"]))
+        icus = [
+            {
+                "icustay_id": random.randint(1_000_000, 9_999_999),
+                "first_careunit": random.choice(["MICU", "SICU", "CCU"]),
+                "last_careunit": random.choice(["MICU", "SICU", "CCU"])
+            }
+            for __ in range(num_icu_per_admission)
+        ]
 
-        for _ in range(num_diag_per_admission):
-            adm["diagnoses_icd"].append(generate_random_diagnosis(adm["hadm_id"]))
+        diags = [
+            {
+                "icd9_code": random.choice(["401.9", "250.00", "414.01"]),
+                "short_title": "Diagnosis Placeholder",
+                "long_title": "Some medical diagnosis"
+            }
+            for __ in range(num_diag_per_admission)
+        ]
 
-        for _ in range(num_notes_per_admission):
-            adm["noteevents"].append(
-                generate_random_noteevent(adm["hadm_id"], p["subject_id"])
-            )
+        notes = [
+            {
+                "category": random.choice(["Radiology", "Discharge summary"]),
+                "text": random.choice(["Patient stable", "Follow-up needed", "Chest X-ray abnormal"])
+            }
+            for __ in range(num_notes_per_admission)
+        ]
 
-        p["admissions"].append(adm)
+        admissions.append(
+            {
+                "hadm_id": hadm,
+                "admittime": random_datetime(),
+                "dischtime": random_datetime(),
+                "insurance": random.choice(["Private", "Medicare", "Medicaid"]),
+                "discharge_location": random.choice(["HOME", "REHAB", "SNF"]),
+                "icustays": icus,
+                "diagnoses_icd": diags,
+                "notes": notes
+            }
+        )
 
-    return p
+    base_patient["admissions"] = admissions
+    base_patient["_mode"] = "complex"
+
+    return base_patient
 
 def insert_patient_postgres(pg, patient):
     cur = pg.cursor()
 
+    # Always insert patient row
     cur.execute("""
-        INSERT INTO patients (subject_id, gender, dob, dod, dod_hosp, dod_ssn, expire_flag)
-        VALUES (%s, %s, %s, NULL, NULL, NULL, 0)
-    """, (
-        patient["subject_id"], patient["gender"], patient["dob"]
-    ))
+        INSERT INTO patients (subject_id, gender, dob)
+        VALUES (%s, %s, %s)
+    """, (patient["subject_id"], patient["gender"], patient["dob"]))
 
-    for adm in patient["admissions"]:
+    # SIMPLE MODE → smaller SQL footprint
+    if patient["_mode"] == "simple":
+        adm = patient["admissions"][0]
 
         cur.execute("""
-            INSERT INTO admissions (
-                subject_id, hadm_id, admittime, dischtime, deathtime,
-                admission_type, admission_location, discharge_location,
-                insurance, language, religion, marital_status, ethnicity,
-                edregtime, edouttime, diagnosis, hospital_expire_flag,
-                has_chartevents
-            )
-            VALUES (%s, %s, %s, %s, NULL,
-                    %s, 'ER', %s,
-                    %s, 'ENGLISH', 'CATHOLIC', 'SINGLE', 'WHITE',
-                    NULL, NULL, %s, 0, 0);
+            INSERT INTO admissions (subject_id, hadm_id, admittime, dischtime, insurance, discharge_location)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (
-            patient["subject_id"], adm["hadm_id"], adm["admittime"], adm["dischtime"],
-            adm["admission_type"], adm["discharge_location"], adm["insurance"],
-            adm["diagnosis"]
+            patient["subject_id"],
+            adm["hadm_id"],
+            adm["admittime"],
+            adm["dischtime"],
+            adm["insurance"],
+            adm["discharge_location"],
         ))
 
+        pg.commit()
+        return
+
+    # COMPLEX MODE → original heavy SQL inserts
+    for adm in patient["admissions"]:
+        cur.execute("""
+            INSERT INTO admissions (subject_id, hadm_id, admittime, dischtime, insurance, discharge_location)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (
+            patient["subject_id"],
+            adm["hadm_id"],
+            adm["admittime"],
+            adm["dischtime"],
+            adm["insurance"],
+            adm["discharge_location"],
+        ))
+
+        # Insert nested rows
         for icu in adm["icustays"]:
             cur.execute("""
-                INSERT INTO icustays (
-                    icustay_id, subject_id, hadm_id, intime, outtime,
-                    first_careunit, last_careunit, los
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                icu["icustay_id"], patient["subject_id"], adm["hadm_id"],
-                icu["intime"], icu["outtime"], icu["first_careunit"], icu["last_careunit"],
-                icu["los"]
-            ))
+                INSERT INTO icustays (hadm_id, icustay_id, first_careunit, last_careunit)
+                VALUES (%s, %s, %s, %s)
+            """, (adm["hadm_id"], icu["icustay_id"], icu["first_careunit"], icu["last_careunit"]))
 
         for diag in adm["diagnoses_icd"]:
             cur.execute("""
-                INSERT INTO diagnoses_icd (subject_id, hadm_id, seq_num, icd9_code)
+                INSERT INTO diagnoses_icd (hadm_id, icd9_code, short_title, long_title)
                 VALUES (%s, %s, %s, %s)
-            """, (
-                patient["subject_id"], adm["hadm_id"],
-                random.randint(1, 50), diag["icd9_code"]
-            ))
-
-        for note in adm["noteevents"]:
-            cur.execute("""
-                INSERT INTO noteevents (
-                    subject_id, hadm_id, chartdate, storetime,
-                    category, description, text, iserror
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NULL)
-            """, (
-                note["subject_id"], note["hadm_id"],
-                note["chartdate"], note["storetime"],
-                note["category"], note["description"], note["text"]
-            ))
+            """, (adm["hadm_id"], diag["icd9_code"], diag["short_title"], diag["long_title"]))
 
     pg.commit()
 
 def insert_patient_mongo(mongo, patient):
     mongo["patients"].insert_one(patient)
 
-    notes = []
-    for adm in patient["admissions"]:
-        for n in adm["noteevents"]:
-            notes.append(n)
+def log_insertion_action(patient):
+    """
+    Logs a human-readable description of what this insertion batch is doing,
+    in terms of logical data: how many admissions, ICU stays, diagnoses, etc.
+    """
+    mode = patient.get("_mode", "unknown")
+    admissions = patient.get("admissions", [])
 
-    if notes:
-        mongo["noteevents"].insert_many(notes)
+    num_adm = len(admissions)
+    num_icu = sum(len(a.get("icustays", [])) for a in admissions)
+    num_diag = sum(len(a.get("diagnoses_icd", [])) for a in admissions)
+    num_notes = sum(len(a.get("notes", [])) for a in admissions)
+
+    log(f"  Insertion pattern: {mode.upper()} patient")
+    log(f"    subject_id={patient.get('subject_id')}")
+    log(f"    Admissions: {num_adm}, ICU stays: {num_icu}, Diagnoses: {num_diag}, Notes: {num_notes}")
+
+    # Explain what each DB is logically doing
+    if mode == "simple":
+        log("    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).")
+        log("    NOSQL action: insert 1 small, shallow patient document.")
+    elif mode == "complex":
+        log("    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.")
+        log("    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.")
+    else:
+        log("    (Unknown mode: logging basic counts only.)")
 
 def test_insertions(index, postgres_connection, mongo_connection):
     log("-"*40)
@@ -1150,6 +1220,7 @@ def test_insertions(index, postgres_connection, mongo_connection):
         num_notes_per_admission=3
     )
 
+    log_insertion_action(patient)
     # Test PostgreSQL insertion
     print("inserting into SQL ...")
     (pg_result, pg_time) = run_and_time(insert_patient_postgres, postgres_connection, patient)
@@ -1177,7 +1248,7 @@ def test_insertions(index, postgres_connection, mongo_connection):
 
     log(f"NOSQL is {abs(percent_diff):.0%} {'faster' if percent_diff < 0 else 'slower'} than SQL")
 
-    return percent_diff
+    return (pg_time, mongo_time, percent_diff)
 
 def run_insertion_tests(postgres, mongo, batches=20):
     log("="*50)
@@ -1185,22 +1256,17 @@ def run_insertion_tests(postgres, mongo, batches=20):
     log("Comparing SQL vs NoSQL insert speeds\n")
 
     all_percent_diff = []
-    total = 0
 
     for i in range(batches):
         diff = test_insertions(i, postgres, mongo)
         all_percent_diff.append(diff)
-        total += diff
 
     log("="*50)
     log("INSERTION TEST COMPLETE RESULTS\n")
 
     for i, diff in enumerate(all_percent_diff):
-        log(f"Batch {i+1}: NOSQL is {abs(diff):.0%} {'faster' if diff < 0 else 'slower'} than SQL")
+        log(f"Batch {i+1}: NOSQL is {abs(diff[2]):.0%} {'faster' if diff[2] < 0 else 'slower'} than SQL")
 
-    avg = total / batches
-    log("-"*40)
-    log(f" Average insertion time difference: {avg:.0%}")
     log("="*50)
 
     # ---- GENERAL TRENDS ----
@@ -1212,7 +1278,7 @@ def run_insertion_tests(postgres, mongo, batches=20):
     sql_faster = []
 
     for i, diff in enumerate(all_percent_diff):
-        if diff < 0:
+        if diff[2] < 0:
             mongo_faster.append(i + 1)
         else:
             sql_faster.append(i + 1)
@@ -1236,8 +1302,7 @@ def main():
     run_query_tests(postgres, mongo)
     run_insertion_tests(postgres, mongo)
 
-    with open("reports/performance_report.txt", "w") as f:
-        f.write("".join(report_log))
+
 
 
 if __name__ == "__main__":
@@ -1269,21 +1334,45 @@ if __name__ == "__main__":
         outfile = f"reports/performance_test_results/performance_test{test_number}_insert.csv"
 
     postgres.close()
+# -------------------------------
+# EXPORT RESULTS TO CSV
+# -------------------------------
+with open(outfile, "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
 
-    # -------------------------------
-    # EXPORT RESULTS TO CSV
-    # -------------------------------
-    with open(outfile, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
+    # Headers
+    if mode == "query":
+        writer.writerow([
+            "Query Number",
+            "Percent Diff SQL→Mongo (mongo - sql) / sql",
+            "Percent Diff Mongo→SQL (sql - mongo) / mongo"
+        ])
+    else:
+        writer.writerow([
+            "Batch Number",
+            "Percent Diff SQL→Mongo (mongo - sql) / sql",
+            "Percent Diff Mongo→SQL (sql - mongo) / mongo"
+        ])
 
-        if mode == "query":
-            writer.writerow(["Query Number", "Percent Difference"])
-            for i, diff in enumerate(results):
-                writer.writerow([i + 1, round(diff*100, 0)])
+    # Rows
+    for i, (sql_time, mongo_time, diff_time) in enumerate(results):
 
-        else:  # insertion mode
-            writer.writerow(["Batch Number", "Percent Difference"])
-            for i, diff in enumerate(results):
-                writer.writerow([i + 1, round(diff*100, 0)])
+        if sql_time == 0:
+            pd_sql_to_mongo = float("inf")
+        else:
+            pd_sql_to_mongo = (mongo_time - sql_time) / sql_time
+
+        if mongo_time == 0:
+            pd_mongo_to_sql = float("inf")
+        else:
+            pd_mongo_to_sql = (sql_time - mongo_time) / mongo_time
+
+        writer.writerow([
+            i + 1,
+            round(pd_sql_to_mongo * 100, 1),
+            round(pd_mongo_to_sql * 100, 1)
+        ])
 
     print(f"\nSaved results to {outfile}")
+    with open("reports/performance_report.txt", "w") as f:
+        f.write("".join(report_log))

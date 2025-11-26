@@ -1,281 +1,238 @@
 ==================================================
-SOEN 363 ASSIGNEMENT PART 2 PERFORMANCE TEST REPORT
-==================================================
-comparing retrieval times for queries from part 1
-
-----------------------------------------
-Testing: query 1 from part 1
-SQL time: 0.45 sec
-NO SQL time: 2.08 sec
-NOSQL is 358% slower than SQL
-----------------------------------------
-Testing: query 2 from part 1
-SQL time: 1.05 sec
-NO SQL time: 0.03 sec
-NOSQL is 98% faster than SQL
-----------------------------------------
-Testing: query 3 from part 1
-SQL time: 0.73 sec
-NO SQL time: 1.85 sec
-NOSQL is 154% slower than SQL
-----------------------------------------
-Testing: query 4 from part 1
-SQL time: 0.06 sec
-NO SQL time: 0.55 sec
-NOSQL is 795% slower than SQL
-----------------------------------------
-Testing: query 5 from part 1
-SQL time: 0.22 sec
-NO SQL time: 0.79 sec
-NOSQL is 253% slower than SQL
-----------------------------------------
-Testing: query 6 from part 1
-SQL time: 0.14 sec
-NO SQL time: 1.08 sec
-NOSQL is 662% slower than SQL
-----------------------------------------
-Testing: query 7 from part 1
-SQL time: 0.29 sec
-NO SQL time: 1.17 sec
-NOSQL is 298% slower than SQL
-----------------------------------------
-Testing: query 8 from part 1
-SQL time: 0.47 sec
-NO SQL time: 1.87 sec
-NOSQL is 295% slower than SQL
-----------------------------------------
-Testing: query 9 from part 1
-SQL time: 0.01 sec
-NO SQL time: 0.00 sec
-NOSQL is 40% faster than SQL
-----------------------------------------
-Testing: query 10 from part 1
-SQL time: 0.21 sec
-NO SQL time: 0.27 sec
-NOSQL is 28% slower than SQL
-----------------------------------------
-Testing: query 11 from part 1
-SQL time: 0.17 sec
-NO SQL time: 0.45 sec
-NOSQL is 169% slower than SQL
-----------------------------------------
-Testing: query 12 from part 1
-SQL time: 0.10 sec
-NO SQL time: 0.00 sec
-NOSQL is 98% faster than SQL
-----------------------------------------
-Testing: query 13 from part 1
-SQL time: 0.23 sec
-NO SQL time: 1.51 sec
-NOSQL is 544% slower than SQL
-----------------------------------------
-Testing: query 14 from part 1
-SQL time: 0.05 sec
-NO SQL time: 3.08 sec
-NOSQL is 6744% slower than SQL
-----------------------------------------
-Testing: query 15 from part 1
-SQL time: 0.19 sec
-NO SQL time: 0.48 sec
-NOSQL is 157% slower than SQL
-----------------------------------------
-Testing: query 16 from part 1
-SQL time: 0.12 sec
-NO SQL time: 0.39 sec
-NOSQL is 224% slower than SQL
-----------------------------------------
-Testing: query 17 from part 1
-SQL time: 0.02 sec
-NO SQL time: 0.11 sec
-NOSQL is 439% slower than SQL
-----------------------------------------
-Testing: query 18 from part 1
-SQL time: 0.01 sec
-NO SQL time: 0.11 sec
-NOSQL is 691% slower than SQL
-----------------------------------------
-Testing: query 19 from part 1
-SQL time: 0.06 sec
-NO SQL time: 0.11 sec
-NOSQL is 75% slower than SQL
-----------------------------------------
-Testing: query 20 from part 1
-SQL time: 0.00 sec
-NO SQL time: 0.00 sec
-NOSQL is 5% faster than SQL
-==================================================
-PERFORMANCE TEST COMPLETE RESULTS
-
-Q1: NOSQL is 358% slower than SQL
-Q2: NOSQL is 98% faster than SQL
-Q3: NOSQL is 154% slower than SQL
-Q4: NOSQL is 795% slower than SQL
-Q5: NOSQL is 253% slower than SQL
-Q6: NOSQL is 662% slower than SQL
-Q7: NOSQL is 298% slower than SQL
-Q8: NOSQL is 295% slower than SQL
-Q9: NOSQL is 40% faster than SQL
-Q10: NOSQL is 28% slower than SQL
-Q11: NOSQL is 169% slower than SQL
-Q12: NOSQL is 98% faster than SQL
-Q13: NOSQL is 544% slower than SQL
-Q14: NOSQL is 6744% slower than SQL
-Q15: NOSQL is 157% slower than SQL
-Q16: NOSQL is 224% slower than SQL
-Q17: NOSQL is 439% slower than SQL
-Q18: NOSQL is 691% slower than SQL
-Q19: NOSQL is 75% slower than SQL
-Q20: NOSQL is 5% faster than SQL
-----------------------------------------
- Average time difference: 5.82286057311144
-==================================================
-==================================================
-GENERAL QUERY PERFORMANCE TRENDS SUMMARY
-==================================================
-Queries where MongoDB was faster: [2, 9, 12, 20]
-Queries where PostgreSQL was faster: [1, 3, 4, 5, 6, 7, 8, 10, 11, 13, 14, 15, 16, 17, 18, 19]
-
-MongoDB faster in 4 / 20 queries
-PostgreSQL faster in 16 / 20 queries
-
-==================================================
-==================================================
 INSERTION PERFORMANCE TESTING
 Comparing SQL vs NoSQL insert speeds
 
 ----------------------------------------
 Testing: insertion batch 1
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.03 sec
-NOSQL is 581% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=3824661
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0095 sec
+NO SQL insert time: 0.0202 sec
+NOSQL is 114% slower than SQL
 ----------------------------------------
 Testing: insertion batch 2
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 123% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=6526899
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0005 sec
+NO SQL insert time: 0.0007 sec
+NOSQL is 25% slower than SQL
 ----------------------------------------
 Testing: insertion batch 3
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 201% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=4624480
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0006 sec
+NOSQL is 55% slower than SQL
 ----------------------------------------
 Testing: insertion batch 4
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 172% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=2155135
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0005 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 5% faster than SQL
 ----------------------------------------
 Testing: insertion batch 5
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 138% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=2830821
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 38% slower than SQL
 ----------------------------------------
 Testing: insertion batch 6
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 164% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=4546732
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 77% slower than SQL
 ----------------------------------------
 Testing: insertion batch 7
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 189% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=2728287
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0007 sec
+NOSQL is 100% slower than SQL
 ----------------------------------------
 Testing: insertion batch 8
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 172% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=6971917
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 66% slower than SQL
 ----------------------------------------
 Testing: insertion batch 9
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 160% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=1875049
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0004 sec
+NOSQL is 19% slower than SQL
 ----------------------------------------
 Testing: insertion batch 10
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 175% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=7667109
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 66% slower than SQL
 ----------------------------------------
 Testing: insertion batch 11
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 262% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=7770625
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 65% slower than SQL
 ----------------------------------------
 Testing: insertion batch 12
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 202% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=9775026
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0005 sec
+NO SQL insert time: 0.0007 sec
+NOSQL is 39% slower than SQL
 ----------------------------------------
 Testing: insertion batch 13
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 157% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=2506638
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0006 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 17% faster than SQL
 ----------------------------------------
 Testing: insertion batch 14
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 164% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=2388239
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0006 sec
+NOSQL is 51% slower than SQL
 ----------------------------------------
 Testing: insertion batch 15
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 120% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=3003641
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0007 sec
+NOSQL is 72% slower than SQL
 ----------------------------------------
 Testing: insertion batch 16
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 161% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=4960848
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0007 sec
+NOSQL is 135% slower than SQL
 ----------------------------------------
 Testing: insertion batch 17
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 233% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=5370788
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0004 sec
+NOSQL is 36% slower than SQL
 ----------------------------------------
 Testing: insertion batch 18
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 182% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=8531694
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 42% slower than SQL
 ----------------------------------------
 Testing: insertion batch 19
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 179% slower than SQL
+  Insertion pattern: SIMPLE patient
+    subject_id=4963416
+    Admissions: 1, ICU stays: 0, Diagnoses: 0, Notes: 0
+    SQL action: insert 1 patient row + 1 admission row (no ICU, no diagnoses, no notes).
+    NOSQL action: insert 1 small, shallow patient document.
+SQL insert time: 0.0003 sec
+NO SQL insert time: 0.0005 sec
+NOSQL is 46% slower than SQL
 ----------------------------------------
 Testing: insertion batch 20
-SQL insert time: 0.00 sec
-NO SQL insert time: 0.00 sec
-NOSQL is 193% slower than SQL
+  Insertion pattern: COMPLEX patient
+    subject_id=9692785
+    Admissions: 2, ICU stays: 2, Diagnoses: 6, Notes: 6
+    SQL action: insert 1 patient row + multiple admissions + ICU stays + diagnoses rows.
+    NOSQL action: insert 1 large nested patient document with embedded admissions/ICU/diagnoses/notes.
+SQL insert time: 0.0004 sec
+NO SQL insert time: 0.0013 sec
+NOSQL is 251% slower than SQL
 ==================================================
 INSERTION TEST COMPLETE RESULTS
 
-Batch 1: NOSQL is 581% slower than SQL
-Batch 2: NOSQL is 123% slower than SQL
-Batch 3: NOSQL is 201% slower than SQL
-Batch 4: NOSQL is 172% slower than SQL
-Batch 5: NOSQL is 138% slower than SQL
-Batch 6: NOSQL is 164% slower than SQL
-Batch 7: NOSQL is 189% slower than SQL
-Batch 8: NOSQL is 172% slower than SQL
-Batch 9: NOSQL is 160% slower than SQL
-Batch 10: NOSQL is 175% slower than SQL
-Batch 11: NOSQL is 262% slower than SQL
-Batch 12: NOSQL is 202% slower than SQL
-Batch 13: NOSQL is 157% slower than SQL
-Batch 14: NOSQL is 164% slower than SQL
-Batch 15: NOSQL is 120% slower than SQL
-Batch 16: NOSQL is 161% slower than SQL
-Batch 17: NOSQL is 233% slower than SQL
-Batch 18: NOSQL is 182% slower than SQL
-Batch 19: NOSQL is 179% slower than SQL
-Batch 20: NOSQL is 193% slower than SQL
-----------------------------------------
- Average insertion time difference: 1.9646487369997245
+Batch 1: NOSQL is 114% slower than SQL
+Batch 2: NOSQL is 25% slower than SQL
+Batch 3: NOSQL is 55% slower than SQL
+Batch 4: NOSQL is 5% faster than SQL
+Batch 5: NOSQL is 38% slower than SQL
+Batch 6: NOSQL is 77% slower than SQL
+Batch 7: NOSQL is 100% slower than SQL
+Batch 8: NOSQL is 66% slower than SQL
+Batch 9: NOSQL is 19% slower than SQL
+Batch 10: NOSQL is 66% slower than SQL
+Batch 11: NOSQL is 65% slower than SQL
+Batch 12: NOSQL is 39% slower than SQL
+Batch 13: NOSQL is 17% faster than SQL
+Batch 14: NOSQL is 51% slower than SQL
+Batch 15: NOSQL is 72% slower than SQL
+Batch 16: NOSQL is 135% slower than SQL
+Batch 17: NOSQL is 36% slower than SQL
+Batch 18: NOSQL is 42% slower than SQL
+Batch 19: NOSQL is 46% slower than SQL
+Batch 20: NOSQL is 251% slower than SQL
 ==================================================
 ==================================================
 GENERAL INSERTION PERFORMANCE TRENDS SUMMARY
 ==================================================
-Insertion batches where MongoDB was faster: []
-Insertion batches where PostgreSQL was faster: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+Insertion batches where MongoDB was faster: [4, 13]
+Insertion batches where PostgreSQL was faster: [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20]
 
-MongoDB faster in 0 / 20 batches
-PostgreSQL faster in 20 / 20 batches
+MongoDB faster in 2 / 20 batches
+PostgreSQL faster in 18 / 20 batches
 
 ==================================================
