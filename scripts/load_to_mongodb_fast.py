@@ -9,6 +9,7 @@ from datetime import datetime, date
 from decimal import Decimal
 import os
 import sys
+import csv
 
 def convert_to_mongo_compatible(obj):
     """Convert Python objects to MongoDB-compatible types"""
@@ -283,6 +284,37 @@ def verify_data(mongo_db):
         print(f"✗ Verification failed: {e}")
         return False
 
+def log_load_performance(duration_seconds, patients_count, noteevents_count):
+    """Append load performance results to a CSV file."""
+    output_dir = os.path.join(PROJECT_ROOT, "reports", "performance_test_results")
+    os.makedirs(output_dir, exist_ok=True)
+
+    csv_path = os.path.join(output_dir, "performance_test_load.csv")
+
+    file_exists = os.path.isfile(csv_path)
+
+    with open(csv_path, "a", newline="") as f:
+        writer = csv.writer(f)
+
+        # Write header only first time
+        if not file_exists:
+            writer.writerow([
+                "timestamp",
+                "duration_seconds",
+                "duration_minutes",
+                "patients_inserted",
+                "noteevents_inserted"
+            ])
+
+        writer.writerow([
+            datetime.now().isoformat(),
+            f"{duration_seconds:.2f}",
+            f"{duration_seconds/60:.2f}",
+            patients_count,
+            noteevents_count
+        ])
+
+
 def main():
     print("=" * 70)
     print("SOEN363 PHASE 2 - FAST MONGODB LOADING")
@@ -318,6 +350,7 @@ def main():
             print("✓ MongoDB migration completed successfully!")
             print(f"  Total time: {duration:.2f} seconds ({duration/60:.1f} minutes)")
             print("=" * 70)
+            log_load_performance(duration,patients_count, noteevents_count)
 
     except Exception as e:
         print(f"✗ Error: {e}")

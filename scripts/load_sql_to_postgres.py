@@ -8,6 +8,33 @@ import os
 import sys
 from datetime import datetime
 
+import csv
+
+def log_sql_load_performance(label, duration_seconds):
+    """Append SQL load duration to CSV log."""
+    output_dir = os.path.join(PROJECT_ROOT, "reports", "performance_test_results")
+    os.makedirs(output_dir, exist_ok=True)
+
+    csv_path = os.path.join(output_dir, "performance_test_sql_load.csv")
+
+    file_exists = os.path.isfile(csv_path)
+
+    with open(csv_path, "a", newline="") as f:
+        writer = csv.writer(f)
+
+        # Write header once
+        if not file_exists:
+            writer.writerow(["timestamp", "table", "duration_seconds"])
+
+        writer.writerow([
+            datetime.now().isoformat(),
+            label,
+            f"{duration_seconds:.2f}"
+        ])
+
+    print(f"✓ Logged SQL load performance to {csv_path}")
+
+
 POSTGRES_CONFIG = {
     "host": "localhost",
     "port": 5432,
@@ -98,6 +125,7 @@ def load_sql_file(conn, sql_file, label):
 
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
+        log_sql_load_performance(label, duration)
 
         print(f"\n✓ Successfully executed {label} SQL file")
         print(f"  Duration: {duration:.2f} seconds ({duration/60:.1f} minutes)")
